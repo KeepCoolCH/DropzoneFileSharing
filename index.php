@@ -75,7 +75,145 @@ $T = [
 $t = $T[$lang];
 
 $footer = '<footer>' . $t['title'] . ' V.1.1 © 2025 by Kevin Tobler - <a href="https://kevintobler.ch" target="_blank">www.kevintobler.ch</a></footer>';
+							
+$css_style = '<style>
+        body {
+        	font-family: sans-serif;
+        	background: #f8f8f8;
+        	padding: 40px;
+        	text-align: center;
+        	margin: 0;
+        }
+        
+        input[type=file], input[type=password], select {
+        	padding: 10px;
+        	width: 100%;
+        	box-sizing: border-box;
+        	margin-bottom: 10px;
+        	border: 1px solid #ccc;
+			border-radius: 5px;
+			font-size: 1em;
+        }
+		
+		form {
+			background: white;
+			display: inline-block;
+			padding: 20px;
+			border-radius: 10px;
+			box-shadow: 0 0 10px #aaa;
+			max-width: 500px;
+			min-width: 400px;
+		}
+		
+        .password-input {
+            max-width: 100%;
+            margin: 0px auto 10px auto;
+            display: block;
+            box-sizing: border-box;
+        }
+        
+        p {
+        	margin-top: 20px;
+        }
+        
+        h2 {
+			margin-top: 30px;
+			margin-bottom: 20px;
+		}
+        
+        footer {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			background-color: #ffffff;
+			text-align: center;
+			margin: 150px 0px 0px 0px;
+			padding: 15px;
+		}
 
+        #dropzone {
+            border: 2px dashed #aaa;
+            padding: 40px;
+            background: #f9f9f9;
+            color: #777;
+            margin-top: 20px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        #dropzone.dragover {
+            background: #e0ffe0;
+            border-color: #4caf50;
+            color: #000;
+        }
+        
+        /* Spinner style */
+        #spinner {
+            display: none;
+            margin: 20px auto 0 auto;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4caf50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Language selector style */
+        #languageFlags {
+			max-width: 500px;
+			margin: 0 auto 20px auto;
+			text-align: center;
+		}
+		
+		#languageFlags img {
+			width: 32px;
+			height: 21px;
+			cursor: pointer;
+			margin: 0 10px;
+			border: 2px solid transparent;
+			border-radius: 4px;
+			vertical-align: middle;
+			transition: border-color 0.3s ease;
+		}
+		
+		.selected {
+		  opacity: 1 !important;
+		  font-weight: bold;
+		}
+
+		button {
+			padding: 10px 20px;
+			font-size: 1em;
+			cursor: pointer;
+			border: none;
+			background-color: #4caf50;
+			color: white;
+			border-radius: 5px;
+			transition: background-color 0.3s ease;
+		}
+		
+		button:hover {
+			background-color: #45a049;
+		}
+		
+		a {
+		color: #4caf50;
+		text-decoration: none;
+		}
+		
+		a:hover {
+			text-decoration: none;
+			color: #45a049;
+		}
+    </style>';
+    
 $uploadDir = __DIR__ . '/uploads';
 if (!is_dir($uploadDir)) mkdir($uploadDir);
 
@@ -149,79 +287,16 @@ if (isset($_GET['t'])) {
 			if (!$pwValid) {
 				$errorMsg = $pwError ? "<span style='color:red; font-weight:bold;'>{$t['wrong_password']}</span><br><br>" : "";
 				echo "<!DOCTYPE html><html lang='$lang'><head><meta charset='UTF-8'><title>{$t['title']} - {$t['password_required']}</title>
-					<style>
-						body {
-							background: #f8f8f8;
-							font-family: sans-serif;
-							text-align: center;
-							padding: 40px;
-							margin: 0;
-						}
-						footer {
-							position: fixed;
-							bottom: 0;
-							left: 0;
-							width: 100%;
-							background-color: #ffffff;
-							text-align: center;
-							margin: 150px 0px 0px 0px;
-							padding: 15px;
-						}
-						.password-box {
-							background: white;
-							display: inline-block;
-							padding: 20px 30px;
-							border-radius: 10px;
-							box-shadow: 0 0 10px #aaa;
-							max-width: 300px;
-							width: 100%;
-						}
-						h2 {
-							margin-top: 0;
-							margin-bottom: 20px;
-						}
-						input[type='password'] {
-							padding: 10px;
-							width: 100%;
-							box-sizing: border-box;
-							margin-bottom: 15px;
-							border: 1px solid #ccc;
-							border-radius: 5px;
-							font-size: 1em;
-						}
-						button {
-							padding: 10px 20px;
-							font-size: 1em;
-							cursor: pointer;
-							border: none;
-							background-color: #4caf50;
-							color: white;
-							border-radius: 5px;
-							transition: background-color 0.3s ease;
-						}
-						button:hover {
-							background-color: #45a049;
-						}
-						a {
-							color: #4caf50;
-							text-decoration: none;
-						}
-						a:hover {
-							text-decoration: none;
-							color: #45a049;
-						}
-					</style>
+				$css_style
 				</head><body>
 				<h2>{$t['title']} - {$t['password_required']}</h2>
-					<div class='password-box'>
-						$errorMsg
 						<form method='post'>
+						$errorMsg
 							<input type='hidden' name='pw_token' value='" . htmlspecialchars($token) . "'>
 							<input type='password' name='pw_input' placeholder='{$t['enter_password']}' required autofocus>
-							<br>
+							<br><br>
 							<button type='submit'>{$t['start_download']}</button>
 						</form>
-					</div>
 				$footer
 				</body></html>";
 				exit;
@@ -331,9 +406,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
                 'password' => $pw !== '' ? password_hash($pw, PASSWORD_DEFAULT) : null
             ];
             file_put_contents($dataFile, json_encode($fileData));
-            $script = basename($_SERVER['PHP_SELF']);
-			$baseUrl = str_replace("/$script", '', $_SERVER['REQUEST_URI']);
-			$link = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $baseUrl . "?lang=$lang&t=$token";
+            $script = basename($_SERVER['PHP_SELF']); // z. B. index.php oder upload.php
+			$basePath = dirname($_SERVER['PHP_SELF']);
+			if ($basePath === '/' || $basePath === '\\') $basePath = '';
+			if ($script === 'index.php') {
+				$path = "$basePath/";
+			} else {
+				$path = "$basePath/$script";
+			}
+			$link = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $path . "?lang=$lang&t=$token";
             $message = $t['your_link'] . " 
                 <a id='link' href='$link' target='_blank'>$link</a>
                 <button onclick='copyLink()'>{$t['copy']}</button>
@@ -347,110 +428,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
 <head>
     <meta charset="UTF-8" />
     <title><?= $t['title'] ?> - <?= $t['share_files'] ?></title>
-    <style>
-        body { font-family: sans-serif; background: #f8f8f8; padding: 40px; text-align: center; }
-        form { background: white; padding: 20px; border-radius: 10px; display: inline-block; box-shadow: 0 0 10px #aaa; max-width: 500px; }
-        input[type=file], input[type=password], select { padding: 10px; width: 100%; margin-bottom: 10px; }
-        button { padding: 10px 20px; }
-        p { margin-top: 20px; }
-        
-        footer {
-			position: fixed;
-			bottom: 0;
-			left: 0;
-			width: 100%;
-			background-color: #ffffff;
-			text-align: center;
-			margin: 150px 0px 0px 0px;
-			padding: 15px;
-		}
-
-        #dropzone {
-            border: 2px dashed #aaa;
-            padding: 40px;
-            background: #f9f9f9;
-            color: #777;
-            margin-top: 20px;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-
-        #dropzone.dragover {
-            background: #e0ffe0;
-            border-color: #4caf50;
-            color: #000;
-        }
-
-        .password-input {
-            max-width: 100%;
-            margin: 0px auto 10px auto;
-            display: block;
-            box-sizing: border-box;
-        }
-        /* Spinner style */
-        #spinner {
-            display: none;
-            margin: 20px auto 0 auto;
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #4caf50;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Language selector style */
-        #languageFlags {
-			max-width: 500px;
-			margin: 0 auto 20px auto;
-			text-align: center;
-		}
-		
-		#languageFlags img {
-			width: 32px;
-			height: 21px;
-			cursor: pointer;
-			margin: 0 10px;
-			border: 2px solid transparent;
-			border-radius: 4px;
-			vertical-align: middle;
-			transition: border-color 0.3s ease;
-		}
-		
-		.selected {
-		  opacity: 1 !important;
-		  font-weight: bold;
-		}
-
-		button {
-			padding: 10px 20px;
-			font-size: 1em;
-			cursor: pointer;
-			border: none;
-			background-color: #4caf50;
-			color: white;
-			border-radius: 5px;
-			transition: background-color 0.3s ease;
-		}
-		
-		button:hover {
-			background-color: #45a049;
-		}
-		
-		a {
-		color: #4caf50; /* Link color */
-		text-decoration: none; /* No underline */
-		}
-		
-		a:hover {
-			text-decoration: none; /* Optional underline on hover */
-			color: #45a049; /* Hover color */
-		}
-    </style>
+    <?php echo $css_style; ?>
 </head>
 <body>
     <h2><?= $t['title'] ?> - <?= $t['share_files'] ?></h2>
@@ -478,9 +456,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     </form>
 
     <p><?= $message ?></p>
-    <?php
-	echo $footer;
-	?>
+    <?php echo $footer; ?>
 
 <script>
 function copyLink() {
