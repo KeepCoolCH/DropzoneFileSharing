@@ -77,7 +77,7 @@ $t = $T[$lang];
 $footer = '<footer>' . $t['title'] . ' V.1.1 © 2025 by Kevin Tobler - <a href="https://kevintobler.ch" target="_blank">www.kevintobler.ch</a></footer>';
 							
 $css_style = '<style>
-	body {
+        body {
         	font-family: sans-serif;
         	background: #f8f8f8;
         	padding: 40px;
@@ -91,25 +91,25 @@ $css_style = '<style>
         	box-sizing: border-box;
         	margin-bottom: 10px;
         	border: 1px solid #ccc;
-		border-radius: 5px;
-		font-size: 1em;
+			border-radius: 5px;
+			font-size: 1em;
         }
 		
-	form {
-		background: white;
-		display: inline-block;
-		padding: 20px;
-		border-radius: 10px;
-		box-shadow: 0 0 10px #aaa;
-		max-width: 500px;
-		min-width: 400px;
-	}
+		form {
+			background: white;
+			display: inline-block;
+			padding: 20px;
+			border-radius: 10px;
+			box-shadow: 0 0 10px #aaa;
+			max-width: 500px;
+			min-width: 400px;
+		}
 		
         .password-input {
-        	max-width: 100%;
-        	margin: 0px auto 10px auto;
-        	display: block;
-        	box-sizing: border-box;
+            max-width: 100%;
+            margin: 0px auto 10px auto;
+            display: block;
+            box-sizing: border-box;
         }
         
         p {
@@ -117,102 +117,102 @@ $css_style = '<style>
         }
         
         h2 {
-		margin-top: 30px;
-		margin-bottom: 20px;
-	}
+			margin-top: 30px;
+			margin-bottom: 20px;
+		}
         
         footer {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		background-color: #ffffff;
-		text-align: center;
-		margin: 150px 0px 0px 0px;
-		padding: 15px;
-	}
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			background-color: #ffffff;
+			text-align: center;
+			margin: 150px 0px 0px 0px;
+			padding: 15px;
+		}
 
         #dropzone {
-        	border: 2px dashed #aaa;
-        	padding: 40px;
-        	background: #f9f9f9;
-        	color: #777;
-        	margin-top: 20px;
-        	cursor: pointer;
-        	box-sizing: border-box;
+            border: 2px dashed #aaa;
+            padding: 40px;
+            background: #f9f9f9;
+            color: #777;
+            margin-top: 20px;
+            cursor: pointer;
+            box-sizing: border-box;
         }
 
         #dropzone.dragover {
-        	background: #e0ffe0;
-        	border-color: #4caf50;
-        	color: #000;
+            background: #e0ffe0;
+            border-color: #4caf50;
+            color: #000;
         }
         
         /* Spinner style */
         #spinner {
-        	display: none;
-        	margin: 20px auto 0 auto;
-        	border: 6px solid #f3f3f3;
-        	border-top: 6px solid #4caf50;
-        	border-radius: 50%;
-        	width: 40px;
-        	height: 40px;
-        	animation: spin 1s linear infinite;
+            display: none;
+            margin: 20px auto 0 auto;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4caf50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
         }
         
         @keyframes spin {
-        	0% { transform: rotate(0deg); }
-        	100% { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Language selector style */
         #languageFlags {
-		max-width: 500px;
-		margin: 0 auto 20px auto;
-		text-align: center;
-	}
-	
-	#languageFlags img {
-		width: 32px;
-		height: 21px;
-		cursor: pointer;
-		margin: 0 10px;
-		border: 2px solid transparent;
-		border-radius: 4px;
-		vertical-align: middle;
-		transition: border-color 0.3s ease;
-	}
-	
-	.selected {
-		opacity: 1 !important;
-		font-weight: bold;
-	}
+			max-width: 500px;
+			margin: 0 auto 20px auto;
+			text-align: center;
+		}
+		
+		#languageFlags img {
+			width: 32px;
+			height: 21px;
+			cursor: pointer;
+			margin: 0 10px;
+			border: 2px solid transparent;
+			border-radius: 4px;
+			vertical-align: middle;
+			transition: border-color 0.3s ease;
+		}
+		
+		.selected {
+		  opacity: 1 !important;
+		  font-weight: bold;
+		}
 
-	button {
-		padding: 10px 20px;
-		font-size: 1em;
-		cursor: pointer;
-		border: none;
-		background-color: #4caf50;
-		color: white;
-		border-radius: 5px;
-		transition: background-color 0.3s ease;
-	}
-	
-	button:hover {
-		background-color: #45a049;
-	}
-	
-	a {
+		button {
+			padding: 10px 20px;
+			font-size: 1em;
+			cursor: pointer;
+			border: none;
+			background-color: #4caf50;
+			color: white;
+			border-radius: 5px;
+			transition: background-color 0.3s ease;
+		}
+		
+		button:hover {
+			background-color: #45a049;
+		}
+		
+		a {
 		color: #4caf50;
 		text-decoration: none;
-	}
-	
-	a:hover {
-		text-decoration: none;
-		color: #45a049;
-	}
-	</style>';
+		}
+		
+		a:hover {
+			text-decoration: none;
+			color: #45a049;
+		}
+    </style>';
     
 $uploadDir = __DIR__ . '/uploads';
 if (!is_dir($uploadDir)) mkdir($uploadDir);
@@ -231,13 +231,13 @@ function rrmdir($dir) {
 // Generate .htaccess for Upload-Folder (deny direct access)
 $htaccessPath = $uploadDir . '/.htaccess';
 if (!file_exists($htaccessPath)) {
-	$htaccessContent = <<<HTACCESS
+    $htaccessContent = <<<HTACCESS
 # Prevent direct access to files
 Order deny,allow
 Deny from all
 HTACCESS;
 
-	file_put_contents($htaccessPath, $htaccessContent);
+    file_put_contents($htaccessPath, $htaccessContent);
 }
 
 $dataFile = $uploadDir . '/.filedata.json';
@@ -255,7 +255,7 @@ foreach ($fileData as $token => $info) {
         unset($fileData[$token]);
     }
 }
-file_put_contents($dataFile, json_encode($fileData));
+file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
 
 // DOWNLOAD
 if (isset($_GET['t'])) {
@@ -269,7 +269,7 @@ if (isset($_GET['t'])) {
     $filePath = $uploadDir . '/' . $info['path'];
     if (!file_exists($filePath)) {
         unset($fileData[$token]);
-        file_put_contents($dataFile, json_encode($fileData));
+        file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
         http_response_code(410);
         die($t['file_missing']);
     }
@@ -286,7 +286,7 @@ if (isset($_GET['t'])) {
 		
 			if (!$pwValid) {
 				$errorMsg = $pwError ? "<span style='color:red; font-weight:bold;'>{$t['wrong_password']}</span><br><br>" : "";
-				echo "<!DOCTYPE html><html lang='$lang'><head><meta charset='UTF-8'><title>{$t['title']} - {$t['password_required']}</title>
+				echo "<!DOCTYPE html><html lang='$lang'><head><meta charset='UTF-8' name='viewport' content='width=device-width, initial-scale=0.6'><title>{$t['title']} - {$t['password_required']}</title>
 				$css_style
 				</head><body>
 				<h2>{$t['title']} - {$t['password_required']}</h2>
@@ -305,7 +305,7 @@ if (isset($_GET['t'])) {
 
     if ($info['type'] === 'once') {
         $fileData[$token]['used'] = true;
-        file_put_contents($dataFile, json_encode($fileData));
+        file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
     }
 
     header('Content-Description: File Transfer');
@@ -400,13 +400,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
                     '1d' => 86400,
                     '3d' => 3 * 86400,
                     '7d' => 7 * 86400,
-                    default => 3600,
+                    default => 7 * 86400,
                 },
                 'used' => false,
                 'password' => $pw !== '' ? password_hash($pw, PASSWORD_DEFAULT) : null
             ];
-            file_put_contents($dataFile, json_encode($fileData));
-            $script = basename($_SERVER['PHP_SELF']); // z. B. index.php oder upload.php
+            file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
+            $script = basename($_SERVER['PHP_SELF']);
 			$basePath = dirname($_SERVER['PHP_SELF']);
 			if ($basePath === '/' || $basePath === '\\') $basePath = '';
 			if ($script === 'index.php') {
@@ -426,7 +426,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
 <!DOCTYPE html>
 <html lang="<?= $lang ?>">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=0.6" />
     <title><?= $t['title'] ?> - <?= $t['share_files'] ?></title>
     <?php echo $css_style; ?>
 </head>
