@@ -1,6 +1,6 @@
 <?php
 
-/* Dropzone File Sharing V.1.1
+/* Dropzone File Sharing V.1.2
 made by Kevin Tobler
 www.kevintobler.ch
 */
@@ -22,6 +22,7 @@ $T = [
         'temp_dir_error' => "❌ Konnte temporäres Verzeichnis nicht anlegen.",
         'error_upload_file' => "❌ Fehler beim Hochladen der Datei ",
         'wrong_password' => "❌ Falsches Passwort",
+	'too_large' => "❌ Die Gesamtgröße der Dateien überschreitet das Limit von 2 GB.",
         'your_link' => "Dein Link:",
         'copy' => "📋 Kopieren",
         'copied' => "✅ Kopiert!",
@@ -51,6 +52,7 @@ $T = [
         'temp_dir_error' => "❌ Could not create temporary directory.",
         'error_upload_file' => "❌ Error uploading file ",
         'wrong_password' => "❌ Incorrect password",
+	'too_large' => "❌ The total size of the files exceeds the 2 GB limit.",
         'your_link' => "Your link:",
         'copy' => "📋 Copy",
         'copied' => "✅ Copied!",
@@ -74,7 +76,7 @@ $T = [
 // Use translations
 $t = $T[$lang];
 
-$footer = '<footer>' . $t['title'] . ' V.1.1 © 2025 by Kevin Tobler - <a href="https://kevintobler.ch" target="_blank">www.kevintobler.ch</a></footer>';
+$footer = '<footer>' . $t['title'] . ' V.1.2 © 2025 by Kevin Tobler - <a href="https://kevintobler.ch" target="_blank">www.kevintobler.ch</a></footer>';
 							
 $css_style = '<style>
         body {
@@ -429,6 +431,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=0.6" />
     <title><?= $t['title'] ?> - <?= $t['share_files'] ?></title>
     <?php echo $css_style; ?>
+<script>
+const t = <?= json_encode($t, JSON_UNESCAPED_UNICODE) ?>;
+</script>
 </head>
 <body>
     <h2><?= $t['title'] ?> - <?= $t['share_files'] ?></h2>
@@ -477,8 +482,21 @@ function changeLang(lang) {
 const form = document.getElementById('uploadForm');
 const spinner = document.getElementById('spinner');
 
-form.addEventListener('submit', () => {
-    spinner.style.display = 'block';
+form.addEventListener('submit', (e) => {
+	const maxSize = 2 * 1024 * 1024 * 1024; // 2 GB
+	let totalSize = 0;
+
+	for (let i = 0; i < fileInput.files.length; i++) {
+		totalSize += fileInput.files[i].size;
+	}
+
+	if (totalSize > maxSize) {
+		e.preventDefault();
+		alert("<?= $t['too_large'] ?>");
+		return false;
+	}
+
+	spinner.style.display = 'block';
 });
 
 // Dropzone handling
