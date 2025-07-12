@@ -1,7 +1,7 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links, password protection, and expiration settings.  
-Version **1.2** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **1.3** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
@@ -9,11 +9,13 @@ Version **1.2** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 - 📂 Drag & drop upload for files or entire folders  
 - 🔐 Optional password protection for each upload  
-- ⏳ Set link expiration (1h, 3h, 1–7 days)  
+- ⏳ Set link expiration (1h, 3h, 6h, 12h, 1–30 days)  
 - 🔁 One-time or reusable download links  
 - 📎 Automatically creates a ZIP archive for folder uploads  
 - 🗣️ Multilingual (English & German)  
 - ✨ No database required – pure PHP
+- 🚫 No filesize limit using chunks
+- ✅ Chunked Upload with Progress Bar
 
 ---
 
