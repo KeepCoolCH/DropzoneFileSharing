@@ -1,8 +1,8 @@
 <?php
 
-/* Dropzone File Sharing V.1.2
-made by Kevin Tobler
-www.kevintobler.ch
+/* Dropzone File Sharing V1.3
+   Developed by Kevin Tobler
+   www.kevintobler.ch
 */
 
 // Language default 'de'
@@ -19,10 +19,12 @@ $T = [
         'start_download' => "📥 Download starten",
         'no_file_selected' => "❌ Keine Datei ausgewählt.",
         'upload_error' => "❌ Fehler beim Hochladen der Datei.",
+        'upload_text' => "⬆️ Hochladen",
+        'upload_success' => "✅ Hochladen erfolgreich",
+        'creating_zip' => "⏳ ZIP wird erstellt...",
         'temp_dir_error' => "❌ Konnte temporäres Verzeichnis nicht anlegen.",
         'error_upload_file' => "❌ Fehler beim Hochladen der Datei ",
         'wrong_password' => "❌ Falsches Passwort",
-	'too_large' => "❌ Die Gesamtgröße der Dateien überschreitet das Limit von 2 GB.",
         'your_link' => "Dein Link:",
         'copy' => "📋 Kopieren",
         'copied' => "✅ Kopiert!",
@@ -32,9 +34,13 @@ $T = [
         'download_once' => "⏳ Nur 1× herunterladbar",
         'valid_1h' => "🕐 1 Stunde gültig",
         'valid_3h' => "🕒 3 Stunden gültig",
+        'valid_6h' => "🕕 6 Stunden gültig",
+        'valid_12h' => "🕛 12 Stunden gültig",
         'valid_1d' => "📅 1 Tag gültig",
         'valid_3d' => "📅 3 Tage gültig",
         'valid_7d' => "📅 7 Tage gültig",
+        'valid_14d' => "📅 14 Tage gültig",
+        'valid_30d' => "📅 30 Tage gültig",
         'upload_button' => "📤 Hochladen & Link erstellen",
         'selected_files' => "Ausgewählte Datei",
         'selected_files_plural' => "Ausgewählte Dateien",
@@ -49,10 +55,12 @@ $T = [
         'start_download' => "📥 Start download",
         'no_file_selected' => "❌ No file selected.",
         'upload_error' => "❌ Error uploading the file.",
+        'upload_text' => "⬆️ Upload",
+        'upload_success' => "✅ Upload finished",
+        'creating_zip' => "⏳ Creating ZIP...",
         'temp_dir_error' => "❌ Could not create temporary directory.",
         'error_upload_file' => "❌ Error uploading file ",
         'wrong_password' => "❌ Incorrect password",
-	'too_large' => "❌ The total size of the files exceeds the 2 GB limit.",
         'your_link' => "Your link:",
         'copy' => "📋 Copy",
         'copied' => "✅ Copied!",
@@ -62,9 +70,13 @@ $T = [
         'download_once' => "⏳ Downloadable only 1x",
         'valid_1h' => "🕐 Valid for 1 hour",
         'valid_3h' => "🕒 Valid for 3 hours",
+        'valid_6h' => "🕕 Valid for 6 hours",
+        'valid_12h' => "🕛 Valid for 12 hours",
         'valid_1d' => "📅 Valid for 1 day",
         'valid_3d' => "📅 Valid for 3 days",
         'valid_7d' => "📅 Valid for 7 days",
+        'valid_14d' => "📅 Valid for 14 days",
+        'valid_30d' => "📅 Valid for 30 days",
         'upload_button' => "📤 Upload & create link",
         'selected_files' => "Selected file",
         'selected_files_plural' => "Selected files",
@@ -76,13 +88,13 @@ $T = [
 // Use translations
 $t = $T[$lang];
 
-$footer = '<footer>' . $t['title'] . ' V.1.2 © 2025 by Kevin Tobler - <a href="https://kevintobler.ch" target="_blank">www.kevintobler.ch</a></footer>';
+$footer = '<footer>' . $t['title'] . ' V.1.3 © 2025 by Kevin Tobler - <a href="https://kevintobler.ch" target="_blank">www.kevintobler.ch</a></footer>';
 							
 $css_style = '<style>
         body {
         	font-family: sans-serif;
         	background: #f8f8f8;
-        	padding: 40px;
+        	padding: 40px 40px 120px 40px;
         	text-align: center;
         	margin: 0;
         }
@@ -104,7 +116,7 @@ $css_style = '<style>
 			border-radius: 10px;
 			box-shadow: 0 0 10px #aaa;
 			max-width: 500px;
-			min-width: 400px;
+			min-width: 500px;
 		}
 		
         .password-input {
@@ -150,22 +162,9 @@ $css_style = '<style>
             color: #000;
         }
         
-        /* Spinner style */
-        #spinner {
-            display: none;
-            margin: 20px auto 0 auto;
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #4caf50;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        progress {
+			accent-color: #4caf50;
+		}
 
         /* Language selector style */
         #languageFlags {
@@ -215,9 +214,12 @@ $css_style = '<style>
 			color: #45a049;
 		}
     </style>';
-    
+
+// Create folders
 $uploadDir = __DIR__ . '/uploads';
+$chunksDir = $uploadDir . '/.chunks';
 if (!is_dir($uploadDir)) mkdir($uploadDir);
+if (!is_dir($chunksDir)) mkdir($chunksDir, 0777, true);
 
 // Clean up temp files and folder
 function rrmdir($dir) {
@@ -242,6 +244,7 @@ HTACCESS;
     file_put_contents($htaccessPath, $htaccessContent);
 }
 
+// Generate json-file
 $dataFile = $uploadDir . '/.filedata.json';
 if (!file_exists($dataFile)) file_put_contents($dataFile, '{}');
 
@@ -258,6 +261,14 @@ foreach ($fileData as $token => $info) {
     }
 }
 file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
+
+// Clean up old chunk uploads
+$maxAge = 5 * 3600; // 5 Hours
+foreach (glob("$chunksDir/*") as $uploadFolder) {
+	if (is_dir($uploadFolder) && time() - filemtime($uploadFolder) > $maxAge) {
+		rrmdir($uploadFolder);
+	}
+}
 
 // DOWNLOAD
 if (isset($_GET['t'])) {
@@ -320,110 +331,121 @@ if (isset($_GET['t'])) {
 
 // UPLOAD
 $message = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
-	$originalPaths = json_decode($_POST['paths'] ?? '[]', true);
-    $files = $_FILES['file'];
-    $mode = $_POST['mode'] ?? 'once';
-    $pw = trim($_POST['pw'] ?? '');
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
+    $uploadId = $_POST['uploadId'] ?? '';
+    $chunkIndex = $_POST['chunkIndex'] ?? '';
+    $totalChunks = $_POST['totalChunks'] ?? '';
+    $filename = $_POST['name'] ?? '';
+    $isLastFile = $_POST['isLastFile'] ?? '';
 
-    $fileCount = is_array($files['name']) ? count($files['name']) : 0;
+    $chunkBase = "$chunksDir/$uploadId/" . sha1($filename);
+    if (!is_dir($chunkBase)) mkdir($chunkBase, 0777, true);
 
-    if ($fileCount === 0) {
-        $message = $t['no_file_selected'];
-    } else {
-        $token = bin2hex(random_bytes(8));
-        $targetFiles = [];
+    $chunkPath = "$chunkBase/chunk_$chunkIndex";
+    if (!move_uploaded_file($_FILES['chunk']['tmp_name'], $chunkPath)) {
+        http_response_code(500);
+        die('❌ Upload failed');
+    }
 
-        if ($fileCount === 1) {
-            $name = basename($files['name'][0]);
-            $tmp = $files['tmp_name'][0];
-            if (is_uploaded_file($tmp)) {
-                $safeName = $token . '-' . preg_replace('/[^a-zA-Z0-9._\- äöüÄÖÜß]/u', '_', $name);
-                $target = $uploadDir . '/' . $safeName;
-                if (move_uploaded_file($tmp, $target)) {
-                    // Save only relative path in JSON
-                    $targetFiles[] = ['path' => $safeName, 'name' => $name];
-                } else {
-                    $message = $t['upload_error'];
-                }
+    file_put_contents("$chunkBase/info.txt", $filename);
+
+    if ($isLastFile === '1') {
+        $allComplete = true;
+        $fileChunks = [];
+
+        foreach (glob("$chunksDir/$uploadId/*", GLOB_ONLYDIR) as $fileDir) {
+            $infoPath = "$fileDir/info.txt";
+            $filename = file_exists($infoPath) ? file_get_contents($infoPath) : null;
+            if (!$filename) continue;
+
+            $chunks = glob("$fileDir/chunk_*");
+            sort($chunks);
+            $chunkCount = count($chunks);
+            $expected = null;
+
+            if (file_exists($fileDir . '/chunk_0')) {
+                $firstChunk = basename($chunks[0]);
+                preg_match('/chunk_(\d+)/', end($chunks), $m);
+                $expected = isset($m[1]) ? ($m[1] + 1) : null;
             }
-        } else {
-            $tmpDir = $uploadDir . "/$token";
-            if (!mkdir($tmpDir) && !is_dir($tmpDir)) {
-                $message = $t['temp_dir_error'];
-            } else {
-                for ($i = 0; $i < $fileCount; $i++) {
-				$originalPath = $originalPaths[$i] ?? $files['name'][$i];
-				$tmp = $files['tmp_name'][$i];
-			
-				if (is_uploaded_file($tmp)) {
-					$safeRelativePath = preg_replace('/[^a-zA-Z0-9._\-\/ äöüÄÖÜß]/u', '_', $originalPath);
-					$tmpTarget = $tmpDir . '/' . $safeRelativePath;
-					
-					$targetFolder = dirname($tmpTarget);
-					if (!is_dir($targetFolder)) {
-						mkdir($targetFolder, 0777, true);
-					}
-			
-					if (!move_uploaded_file($tmp, $tmpTarget)) {
-						$message = $t['error_upload_file'] . $originalPath . ".";
-						break;
-					}
-                        // Store path relative to uploads folder
-					$relativePath = $token . '/' . $safeRelativePath;
-					$targetFiles[] = ['path' => $relativePath, 'name' => basename($originalPath)];
-                    }
-                }
-                if ($message === '') {
-                    $zipName = "$token.zip";
-                    $zipPath = $uploadDir . '/' . $zipName;
 
-                    $cmd = "cd " . escapeshellarg($tmpDir) . " && zip -r " .
-					($pw !== '' ? "-P " . escapeshellarg($pw) : "") . " " .
-					escapeshellarg($zipPath) . " .";
-                    shell_exec($cmd);
-                    
-                    rrmdir($tmpDir);
-
-                    $targetFiles = [['path' => $zipName, 'name' => $zipName]];
-                }
+            if (!$expected || $chunkCount != $expected) {
+                $allComplete = false;
+                break;
             }
+
+            $fileChunks[] = ['name' => $filename, 'chunks' => $chunks, 'dir' => $fileDir];
         }
 
-        if ($message === '' && count($targetFiles) === 1) {
+        if ($allComplete) {
+            $token = bin2hex(random_bytes(8));
+            $tempDir = "$uploadDir/$token";
+            mkdir($tempDir, 0777, true);
+
+            foreach ($fileChunks as $item) {
+                $relativePath = preg_replace('/[^\w\-\.\/ äöüÄÖÜß]/u', '_', $item['name']);
+				$fullPath = "$tempDir/$relativePath";
+				
+				$dir = dirname($fullPath);
+				if (!is_dir($dir)) mkdir($dir, 0777, true);
+				
+				$fp = fopen($fullPath, 'wb');
+                foreach ($item['chunks'] as $chunk) {
+                    fwrite($fp, file_get_contents($chunk));
+                }
+                fclose($fp);
+            }
+
+            $zipName = "$token.zip";
+            $zipPath = "$uploadDir/$zipName";
+            $pw = trim($_POST['pw'] ?? '');
+            $cmd = "cd " . escapeshellarg($tempDir) . " && zip -r " .
+                ($pw !== '' ? "-P " . escapeshellarg($pw) : "") . " " .
+                escapeshellarg($zipPath) . " .";
+            shell_exec($cmd);
+            rrmdir($tempDir);
+            rrmdir("$chunksDir/$uploadId");
+
+            $mode = $_POST['mode'] ?? 'once';
             $fileData[$token] = [
-                'name' => $targetFiles[0]['name'],
-                'path' => $targetFiles[0]['path'],
+                'name' => $zipName,
+                'path' => $zipName,
                 'time' => time(),
-                'type' => in_array($mode, ['1h','3h','1d','3d','7d']) ? 'time' : 'once',
+                'type' => in_array($mode, ['1h','3h','6h','12h','1d','3d','7d','14d','30d']) ? 'time' : 'once',
                 'duration' => match($mode) {
                     '1h' => 3600,
                     '3h' => 3 * 3600,
-                    '1d' => 86400,
-                    '3d' => 3 * 86400,
-                    '7d' => 7 * 86400,
-                    default => 7 * 86400,
+                    '6h' => 6 * 3600,
+                    '12h' => 12 * 3600,
+                    '1d' => 1 * 24 * 3600,
+                    '3d' => 3 * 24 * 3600,
+                    '7d' => 7 * 24 * 3600,
+                    '14d' => 14 * 24 * 3600,
+                    '30d' => 30 * 24 * 3600,
+                    default => 30 * 24 * 3600,
                 },
                 'used' => false,
                 'password' => $pw !== '' ? password_hash($pw, PASSWORD_DEFAULT) : null
             ];
             file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
+
             $script = basename($_SERVER['PHP_SELF']);
-			$basePath = dirname($_SERVER['PHP_SELF']);
-			if ($basePath === '/' || $basePath === '\\') $basePath = '';
-			if ($script === 'index.php') {
-				$path = "$basePath/";
-			} else {
-				$path = "$basePath/$script";
-			}
-			$link = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $path . "?lang=$lang&t=$token";
-            $message = $t['your_link'] . " 
-                <a id='link' href='$link' target='_blank'>$link</a>
-                <button onclick='copyLink()'>{$t['copy']}</button>
-                <span id='copied' style='color:green; display:none;'>{$t['copied']}</span>";
+            $basePath = dirname($_SERVER['PHP_SELF']);
+            if ($basePath === '/' || $basePath === '\\') $basePath = '';
+            $path = ($script === 'index.php') ? "$basePath/" : "$basePath/$script";
+            $link = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $path . "?lang=$lang&t=$token";
+            echo $t['your_link'] . " 
+				<a id='link' href='$link' target='_blank'>$link</a>
+				<button onclick='copyLink()'>{$t['copy']}</button>
+				<span id='copied' style='color:#4caf50; display:none;'>{$t['copied']}</span>";
+			exit;
         }
     }
+
+    http_response_code(200);
+    exit;
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="<?= $lang ?>">
@@ -452,25 +474,33 @@ const t = <?= json_encode($t, JSON_UNESCAPED_UNICODE) ?>;
             <option value="once"><?= $t['download_once'] ?></option>
             <option value="1h"><?= $t['valid_1h'] ?></option>
             <option value="3h"><?= $t['valid_3h'] ?></option>
+            <option value="6h"><?= $t['valid_6h'] ?></option>
+            <option value="12h"><?= $t['valid_12h'] ?></option>
             <option value="1d"><?= $t['valid_1d'] ?></option>
             <option value="3d"><?= $t['valid_3d'] ?></option>
             <option value="7d"><?= $t['valid_7d'] ?></option>
+            <option value="14d"><?= $t['valid_14d'] ?></option>
+            <option value="30d"><?= $t['valid_30d'] ?></option>
         </select><br><br>
         <button type="submit"><?= $t['upload_button'] ?></button>
-        <div id="spinner"></div>
+        <progress id="progressBar" value="0" max="100" style="width:100%; display:none; margin-top:20px;"></progress>
+		<div id="progressText" style="margin-top:5px; display:none;"></div>
+		<div id="uploadStatusText" style="margin-top:5px; display:none;"></div>
     </form>
 
     <p><?= $message ?></p>
     <?php echo $footer; ?>
 
 <script>
+let files = [];
+
 function copyLink() {
-    const link = document.getElementById("link").href;
-    navigator.clipboard.writeText(link).then(() => {
-        const copied = document.getElementById("copied");
-        copied.style.display = "inline";
-        setTimeout(() => copied.style.display = "none", 2000);
-    });
+	const link = document.getElementById("link").href;
+	navigator.clipboard.writeText(link).then(() => {
+		const copied = document.getElementById("copied");
+		copied.style.display = "inline";
+		setTimeout(() => copied.style.display = "none", 2000);
+	});
 }
 
 function changeLang(lang) {
@@ -480,24 +510,81 @@ function changeLang(lang) {
 }
 
 const form = document.getElementById('uploadForm');
-const spinner = document.getElementById('spinner');
 
-form.addEventListener('submit', (e) => {
-	const maxSize = 2 * 1024 * 1024 * 1024; // 2 GB
-	let totalSize = 0;
+form.addEventListener('submit', async (e) => {
+	e.preventDefault();
 
-	for (let i = 0; i < fileInput.files.length; i++) {
-		totalSize += fileInput.files[i].size;
+	const uploadId = [...crypto.getRandomValues(new Uint8Array(8))].map(b => b.toString(16).padStart(2, '0')).join('');
+	const mode = form.querySelector('[name="mode"]').value;
+	const pw = form.querySelector('[name="pw"]').value;
+	const paths = JSON.parse(document.getElementById('paths').value || '[]');
+	const progressBar = document.getElementById('progressBar');
+	progressBar.style.display = 'block';
+	const progressText = document.getElementById('progressText');
+	progressText.style.display = 'block';
+
+	let totalUploaded = 0;
+	const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+
+	for (let i = 0; i < files.length; i++) {
+		const file = files[i];
+		const chunkSize = 1024 * 1024 * 10; // 10 MB
+		const totalChunks = Math.ceil(file.size / chunkSize);
+		const rawName = paths[i] || file.name;
+		const name = rawName.replace(/^(\.\.[\/\\])+/, '').replace(/^\/+/, '');
+
+		for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+			const chunk = file.slice(chunkIndex * chunkSize, (chunkIndex + 1) * chunkSize);
+			const formData = new FormData();
+			formData.append('chunk', chunk);
+			formData.append('chunkIndex', chunkIndex);
+			formData.append('totalChunks', totalChunks);
+			formData.append('uploadId', uploadId);
+			formData.append('name', name);
+			formData.append('pw', pw);
+			formData.append('mode', mode);
+			const isLastFile = (i === files.length - 1 && chunkIndex === totalChunks - 1) ? '1' : '0';
+			formData.append('isLastFile', isLastFile);
+
+			try {
+				const response = await fetch('', {
+					method: 'POST',
+					body: formData
+				});
+
+				totalUploaded += chunk.size;
+				const percent = Math.min(100, Math.round((totalUploaded / totalBytes) * 100));
+				progressBar.value = percent;
+				progressText.textContent = t.upload_text + ' ' + percent + '%';
+				if (percent >= 90) {
+					progressText.style.display = 'none';
+					document.getElementById('uploadStatusText').textContent = t.creating_zip;
+					document.getElementById('uploadStatusText').style.display = 'block';
+				}
+
+				if (isLastFile === '1') {
+					if (response.ok) {
+						document.getElementById('uploadStatusText').style.display = 'none';
+						progressText.textContent = (t.upload_success || 'finished');
+						progressText.style.display = 'block';
+						progressText.style.color = '#4caf50';
+						const html = await response.text();
+						document.querySelector('p').innerHTML = html;
+					} else {
+						alert(t.upload_error);
+					}
+				}
+			} catch (err) {
+				alert(t.upload_error);
+				progressBar.style.display = 'none';
+				progressText.style.display = 'none';
+				document.getElementById('uploadStatusText').style.display = 'none';
+				return;
+			}
+		}
 	}
-
-	if (totalSize > maxSize) {
-		e.preventDefault();
-		alert("<?= $t['too_large'] ?>");
-		return false;
-	}
-
-	spinner.style.display = 'block';
 });
+
 
 // Dropzone handling
 const dropzone = document.getElementById('dropzone');
@@ -505,96 +592,91 @@ const fileInput = document.getElementById('fileInput');
 const selectedFileDiv = document.getElementById('selectedFile');
 
 function updateSelectedFile() {
-    if (fileInput.files.length > 0) {
-        let names = [];
-        for (let i = 0; i < fileInput.files.length; i++) {
-            names.push(fileInput.files[i].name);
-        }
-        selectedFileDiv.textContent = (names.length > 1 ? "<?= $t['selected_files_plural'] ?>" : "<?= $t['selected_files'] ?>") + ": " + names.join(', ');
-    } else {
-        selectedFileDiv.textContent = "";
-    }
+	if (fileInput.files.length > 0) {
+		let names = [];
+		for (let i = 0; i < fileInput.files.length; i++) {
+			names.push(fileInput.files[i].name);
+		}
+		selectedFileDiv.textContent = (names.length > 1 ? "<?= $t['selected_files_plural'] ?>" : "<?= $t['selected_files'] ?>") + ": " + names.join(', ');
+	} else {
+		selectedFileDiv.textContent = "";
+	}
 }
 
 async function traverseFileTree(item, path = '', fileList = []) {
-    path = path || '';
-    if (item.isFile) {
-        await new Promise((resolve) => {
-            item.file(file => {
-                // Fügt Pfadname als "fake relative path" hinzu
-                const fileWithPath = new File([file], path + file.name, { type: file.type });
-                fileList.push(fileWithPath);
-                resolve();
-            });
-        });
-    } else if (item.isDirectory) {
-        const reader = item.createReader();
-        await new Promise((resolve) => {
-            reader.readEntries(async entries => {
-                for (const entry of entries) {
-                    await traverseFileTree(entry, path + item.name + '/', fileList);
-                }
-                resolve();
-            });
-        });
-    }
+	if (item.isFile) {
+		await new Promise(resolve => {
+			item.file(file => {
+				const fileWithPath = new File([file], path + file.name, { type: file.type });
+				fileList.push(fileWithPath);
+				resolve();
+			});
+		});
+	} else if (item.isDirectory) {
+		const reader = item.createReader();
+		await new Promise(resolve => {
+			reader.readEntries(async entries => {
+				for (const entry of entries) {
+					await traverseFileTree(entry, path + item.name + '/', fileList);
+				}
+				resolve();
+			});
+		});
+	}
 }
 
 dropzone.addEventListener('click', () => fileInput.click());
 
-fileInput.addEventListener('change', updateSelectedFile);
+fileInput.addEventListener('change', () => {
+	files = Array.from(fileInput.files);
+	document.getElementById('paths').value = JSON.stringify(files.map(f => f.name));
+	updateSelectedFile();
+});
 
 dropzone.addEventListener('dragover', e => {
-    e.preventDefault();
-    dropzone.classList.add('dragover');
+	e.preventDefault();
+	dropzone.classList.add('dragover');
 });
 
 dropzone.addEventListener('dragleave', () => {
-    dropzone.classList.remove('dragover');
+	dropzone.classList.remove('dragover');
 });
 
 dropzone.addEventListener('drop', async (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('dragover');
+	e.preventDefault();
+	dropzone.classList.remove('dragover');
 
-    const dtItems = e.dataTransfer.items;
-    const dtFiles = e.dataTransfer.files;
+	const dtItems = e.dataTransfer.items;
+	const dtFiles = e.dataTransfer.files;
 
-    const files = [];
+	files = [];
 
-    if (dtItems && dtItems.length > 0) {
+	if (dtItems && dtItems.length > 0) {
+		const entriesProcessed = [];
 
-        const entriesProcessed = [];
+		for (let i = 0; i < dtItems.length; i++) {
+			const item = dtItems[i].webkitGetAsEntry?.();
+			if (item) {
+				entriesProcessed.push(traverseFileTree(item, '', files));
+			}
+		}
 
-        for (let i = 0; i < dtItems.length; i++) {
-            const item = dtItems[i].webkitGetAsEntry?.();
-            if (item) {
-                entriesProcessed.push(traverseFileTree(item, '', files));
-            }
-        }
+		await Promise.all(entriesProcessed);
+	}
 
-        await Promise.all(entriesProcessed);
-    }
+	if (files.length === 0 && dtFiles.length > 0) {
+		files = Array.from(dtFiles);
+	}
 
-    if (files.length === 0 && dtFiles && dtFiles.length > 0) {
-        for (let i = 0; i < dtFiles.length; i++) {
-            files.push(dtFiles[i]);
-        }
-    }
+	const dataTransfer = new DataTransfer();
+	for (const file of files) {
+		dataTransfer.items.add(file);
+	}
+	fileInput.files = dataTransfer.files;
 
-    const dataTransfer = new DataTransfer();
-    for (const file of files) {
-        dataTransfer.items.add(file);
-    }
-
-    fileInput.files = dataTransfer.files;
-
-    const paths = files.map(file => file.name);
-    document.getElementById('paths').value = JSON.stringify(paths);
-
-    updateSelectedFile();
+	document.getElementById('paths').value = JSON.stringify(files.map(f => f.name));
+	updateSelectedFile();
 });
-
 </script>
 </body>
 </html>
