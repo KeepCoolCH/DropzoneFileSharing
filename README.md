@@ -1,7 +1,7 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links, password protection, and expiration settings.  
-Version **1.3** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **1.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
@@ -21,7 +21,7 @@ Version **1.3** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 🔧 Installation
 
-1. Upload the `index.php` file to your web server
+1. Upload all files to your web server
 2. Make sure the `uploads/` directory is writable (is created automatically)
 3. Open the application in your browser
 
