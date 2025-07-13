@@ -1,0 +1,122 @@
+body {
+	font-family: sans-serif;
+	background: #f8f8f8;
+	padding: 40px 40px 120px 40px;
+	text-align: center;
+	margin: 0;
+}
+
+input[type=file], input[type=password], select {
+	padding: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	margin-bottom: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 1em;
+}
+
+form {
+	background: white;
+	display: inline-block;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px #aaa;
+	max-width: 500px;
+	min-width: 500px;
+}
+
+.password-input {
+	max-width: 100%;
+	margin: 0px auto 10px auto;
+	display: block;
+	box-sizing: border-box;
+}
+
+p {
+	margin-top: 20px;
+}
+
+h2 {
+	margin-top: 30px;
+	margin-bottom: 20px;
+}
+
+footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: #ffffff;
+	text-align: center;
+	margin: 150px 0px 0px 0px;
+	padding: 15px;
+}
+
+#dropzone {
+	border: 2px dashed #aaa;
+	padding: 40px;
+	background: #f9f9f9;
+	color: #777;
+	margin-top: 20px;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+
+#dropzone.dragover {
+	background: #e0ffe0;
+	border-color: #4caf50;
+	color: #000;
+}
+
+progress {
+	accent-color: #4caf50;
+}
+
+/* Language selector style */
+#languageFlags {
+	max-width: 500px;
+	margin: 0 auto 20px auto;
+	text-align: center;
+}
+
+#languageFlags img {
+	width: 32px;
+	height: 21px;
+	cursor: pointer;
+	margin: 0 10px;
+	border: 2px solid transparent;
+	border-radius: 4px;
+	vertical-align: middle;
+	transition: border-color 0.3s ease;
+}
+
+.selected {
+  opacity: 1 !important;
+  font-weight: bold;
+}
+
+button {
+	padding: 10px 20px;
+	font-size: 1em;
+	cursor: pointer;
+	border: none;
+	background-color: #4caf50;
+	color: white;
+	border-radius: 5px;
+	transition: background-color 0.3s ease;
+}
+
+button:hover {
+	background-color: #45a049;
+}
+
+a {
+color: #4caf50;
+text-decoration: none;
+}
+
+a:hover {
+	text-decoration: none;
+	color: #45a049;
+}

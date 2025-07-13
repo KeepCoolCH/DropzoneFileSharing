@@ -34,7 +34,7 @@ Version **1.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 Default language is German. Use `?lang=en` to switch to English or click on the flag:
 
 ```
-https://example.com/?lang=en
+https://example.com/index.php?lang=en
 ```
 
 ---
