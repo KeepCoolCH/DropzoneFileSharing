@@ -12,7 +12,7 @@ Version **1.5** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 - ⏳ Set link expiration (1h, 3h, 6h, 12h, 1–30 days or keep forever)  
 - 🔁 One-time or reusable download links  
 - 📎 Automatically creates a ZIP archive for folder uploads  
-- 🗣️ Multilingual (English & German)  
+- 🗣️ Multilingual (English, German, French & Italian)  
 - ✨ No database required – pure PHP
 - 🚫 No filesize limit using chunks
 - ✅ Chunked Upload with Progress Bar
