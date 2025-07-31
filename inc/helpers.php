@@ -13,7 +13,7 @@ function rrmdir($dir) {
 // Remove expired files
 foreach ($fileData as $token => $info) {
     $duration = $info['duration'] ?? 3600;
-    $expired = ($info['type'] === 'once' && $info['used']) || ($info['type'] === 'time' && $now - $info['time'] > $duration);
+    $expired = ($info['type'] === 'once' && $info['used']) || ($info['type'] === 'time' && $info['duration'] > 0 && $now - $info['time'] > $info['duration']);
     if ($expired && file_exists($uploadDir . '/' . $info['path'])) {
         unlink($uploadDir . '/' . $info['path']);
         unset($fileData[$token]);
