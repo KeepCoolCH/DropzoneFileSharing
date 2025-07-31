@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
                 'name' => $zipName,
                 'path' => $zipName,
                 'time' => time(),
-                'type' => in_array($mode, ['1h','3h','6h','12h','1d','3d','7d','14d','30d']) ? 'time' : 'once',
+                'type' => in_array($mode, ['1h','3h','6h','12h','1d','3d','7d','14d','30d','forever']) ? 'time' : 'once',
                 'duration' => match($mode) {
                     '1h' => 3600,
                     '3h' => 3 * 3600,
@@ -96,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
                     '7d' => 7 * 24 * 3600,
                     '14d' => 14 * 24 * 3600,
                     '30d' => 30 * 24 * 3600,
+                    'forever' => 0,
                     default => 30 * 24 * 3600,
                 },
                 'used' => false,
@@ -107,12 +108,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
             $basePath = dirname($_SERVER['PHP_SELF']);
             if ($basePath === '/' || $basePath === '\\') $basePath = '';
             $path = ($script === 'index.php') ? "$basePath/" : "$basePath/$script";
-            $link = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $path . "?lang=$lang&t=$token";
-            echo $t['your_link'] . " 
+            if (!Config::$default['onlyupload']) {
+			$link = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $path . "?lang=$lang&t=$token";
+			echo $t['your_link'] . " 
 				<a id='link' href='$link' target='_blank'>$link</a>
 				<button onclick='copyLink()'>{$t['copy']}</button>
 				<span id='copied' style='color:#4caf50; display:none;'>{$t['copied']}</span>";
-			exit;
+        	}
         }
     }
 
