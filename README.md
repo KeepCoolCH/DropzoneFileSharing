@@ -1,7 +1,7 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links, password protection, and expiration settings.  
-Version **1.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **1.5** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
@@ -9,7 +9,7 @@ Version **1.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 - 📂 Drag & drop upload for files or entire folders  
 - 🔐 Optional password protection for each upload  
-- ⏳ Set link expiration (1h, 3h, 6h, 12h, 1–30 days)  
+- ⏳ Set link expiration (1h, 3h, 6h, 12h, 1–30 days or keep forever)  
 - 🔁 One-time or reusable download links  
 - 📎 Automatically creates a ZIP archive for folder uploads  
 - 🗣️ Multilingual (English & German)  
@@ -31,11 +31,26 @@ Version **1.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 🌍 Language Support
 
-Default language is German. Use `?lang=en` to switch to English or click on the flag:
+Default language is German `?lang=de`. Use `?lang=en` to switch to English, `?lang=fr` to switch to French, `?lang=it` to switch to Italian or click on the flag:
 
 ```
+https://example.com/index.php?lang=de
 https://example.com/index.php?lang=en
+https://example.com/index.php?lang=fr
+https://example.com/index.php?lang=it
 ```
+
+---
+
+## ⚙️ Configuration
+
+You can configure the following options:
+
+- 'lang_default' => 'de': Default language (e.g. 'de', 'en', 'fr' or 'it')
+- 'valid_xx' => true/false: Control link expiration options
+- 'onlyupload' => true/false: Disable password protection and only allow upload without generating a link with the setting "true" (only admin can download files from the upload folder)
+
+> ⚠️ Changes take effect automatically on the next page load.
 
 ---
 
