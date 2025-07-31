@@ -12,3 +12,20 @@ $fileData = json_decode(file_get_contents($dataFile), true);
 if (!is_array($fileData)) $fileData = [];
 
 $now = time();
+
+class Config {
+    public static $default = [
+        'lang_default' => 'de',
+        'valid_1h' => true,
+        'valid_3h' => true,
+        'valid_6h' => true,
+        'valid_12h' => true,
+        'valid_1d' => true,
+        'valid_3d' => true,
+        'valid_7d' => true,
+        'valid_14d' => true,
+        'valid_30d' => true,
+        'valid_forever' => true,
+        'onlyupload' => false,
+    ];
+}
