@@ -21,8 +21,10 @@ form.addEventListener('submit', async (e) => {
 	e.preventDefault();
 
 	const uploadId = [...crypto.getRandomValues(new Uint8Array(8))].map(b => b.toString(16).padStart(2, '0')).join('');
-	const mode = form.querySelector('[name="mode"]').value;
-	const pw = form.querySelector('[name="pw"]').value;
+	const modeField = form.querySelector('[name="mode"]');
+	const pwField = form.querySelector('[name="pw"]');
+	const mode = modeField ? modeField.value : 'once';
+	const pw = pwField ? pwField.value : '';
 	const paths = JSON.parse(document.getElementById('paths').value || '[]');
 	const progressBar = document.getElementById('progressBar');
 	progressBar.style.display = 'block';
