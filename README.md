@@ -70,7 +70,7 @@ When uploading a folder, the tool detects it and automatically creates a ZIP fil
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharing.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharing1_5.png)
 
 ---
 
