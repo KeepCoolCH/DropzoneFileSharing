@@ -51,7 +51,7 @@ require_once 'inc/language.php';
         <select name="mode">
 		<?php
 		$validOptions = [
-			'1h', '3h', '6h', '12h', '1d', '3d', '7d', '14d', '30d', 'forever'
+			'once', '1h', '3h', '6h', '12h', '1d', '3d', '7d', '14d', '30d', 'forever'
 		];
 		
 		foreach ($validOptions as $opt) {
