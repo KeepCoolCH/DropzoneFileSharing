@@ -16,6 +16,7 @@ $now = time();
 class Config {
     public static $default = [
         'lang_default' => 'de',
+        'valid_once' => true,
         'valid_1h' => true,
         'valid_3h' => true,
         'valid_6h' => true,
