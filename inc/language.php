@@ -44,7 +44,7 @@ $T = [
         'selected_files_plural' => "Ausgewählte Dateien",
         'language' => "Sprache",
         'title' => "Dropzone File Sharing",
-        'version' => "V.1.5",
+        'version' => "V.1.6",
         'footer_text' => "© 2025 von Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
     ],
     'en' => [
@@ -84,7 +84,7 @@ $T = [
         'selected_files_plural' => "Selected files",
         'language' => "Language",
         'title' => "Dropzone File Sharing",
-        'version' => "V.1.5",
+        'version' => "V.1.6",
         'footer_text' => "© 2025 by Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
     ],
     'fr' => [
@@ -124,7 +124,7 @@ $T = [
 	'selected_files_plural' => "Selectionner plusieurs fichiers",
 	'language' => "Langage",
 	'title' => "Dropzone File Sharing",
-	'version' => "V.1.5",
+	'version' => "V.1.6",
 	'footer_text' => "© 2025 par Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
 	],
 	'it' => [
@@ -164,7 +164,7 @@ $T = [
 	'selected_files_plural' => "File selezionati",
 	'language' => "Lingua",
 	'title' => "Dropzone File Sharing",
-	'version' => "V.1.5",
+	'version' => "V.1.6",
 	'footer_text' => "© 2025 di Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
 	]
 ];
