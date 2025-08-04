@@ -16,10 +16,20 @@ input[type=file], input[type=password], select {
 	font-size: 1em;
 }
 
+input[type=email], input[type=text] {
+	padding: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	margin-top: 20px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 1em;
+}
+
 form {
 	background: white;
 	display: inline-block;
-	padding: 20px;
+	padding: 20px 20px 40px 20px;
 	border-radius: 10px;
 	box-shadow: 0 0 10px #aaa;
 	max-width: 500px;
@@ -29,6 +39,13 @@ form {
 .password-input {
 	max-width: 100%;
 	margin: 0px auto 10px auto;
+	display: block;
+	box-sizing: border-box;
+}
+
+.email-input {
+	max-width: 100%;
+	margin: 0px auto 0px auto;
 	display: block;
 	box-sizing: border-box;
 }
@@ -50,7 +67,7 @@ footer {
 	background-color: #ffffff;
 	text-align: center;
 	margin: 150px 0px 0px 0px;
-	padding: 15px;
+	padding: 15px 0px 15px 0px;
 }
 
 #dropzone {
@@ -91,8 +108,8 @@ progress {
 }
 
 .selected {
-	opacity: 1 !important;
-	font-weight: bold;
+  opacity: 1 !important;
+  font-weight: bold;
 }
 
 button {
