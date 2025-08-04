@@ -108,8 +108,8 @@ progress {
 }
 
 .selected {
-  opacity: 1 !important;
-  font-weight: bold;
+	opacity: 1 !important;
+	font-weight: bold;
 }
 
 button {
