@@ -3,9 +3,12 @@
 $uploadDir = __DIR__ . '/../uploads';
 $chunksDir = $uploadDir . '/.chunks';
 $dataFile = $uploadDir . '/.filedata.json';
+$incDir = __DIR__ . '/../inc';
+$envDir = $incDir . '/.env';
 
 if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 if (!is_dir($chunksDir)) mkdir($chunksDir, 0777, true);
+if (!is_dir($envDir)) mkdir($envDir, 0777, true);
 
 if (!file_exists($dataFile)) file_put_contents($dataFile, '{}');
 $fileData = json_decode(file_get_contents($dataFile), true);
@@ -27,6 +30,7 @@ class Config {
         'valid_14d' => true,
         'valid_30d' => true,
         'valid_forever' => true,
-        'onlyupload' => false,
+        'only_upload' => false,
+        'send_email' => true,
     ];
 }
