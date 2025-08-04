@@ -20,7 +20,20 @@ const form = document.getElementById('uploadForm');
 form.addEventListener('submit', async (e) => {
 	e.preventDefault();
 
+	const uploaderEmail = form.querySelector('[name="uploader_email"]').value;
+	const recipientEmail = form.querySelector('[name="recipient_email"]').value;
 	const uploadId = [...crypto.getRandomValues(new Uint8Array(8))].map(b => b.toString(16).padStart(2, '0')).join('');
+	
+	await fetch('save_emailadress.php', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			uploadId,
+			uploader_email: uploaderEmail,
+			recipient_email: recipientEmail
+		})
+	});
+	
 	const mode = form.querySelector('[name="mode"]').value;
 	const pw = form.querySelector('[name="pw"]').value;
 	const paths = JSON.parse(document.getElementById('paths').value || '[]');
