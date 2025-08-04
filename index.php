@@ -42,10 +42,11 @@ require_once 'inc/language.php';
         <div id="selectedFile" style="margin-top:10px; font-style: italic; color: #555;"></div>
         <input type="hidden" name="paths" id="paths">
         <input type="file" name="file[]" id="fileInput" multiple required style="display:none;"><br>
-        <?php if (Config::$default['onlyupload']): ?>
+        <?php if (Config::$default['only_upload']): ?>
         <input type="hidden" name="pw" value="">
     	<input type="hidden" name="mode" value="forever">
-        <button type="submit"><?= $t['upload_button_onlyupload'] ?></button>
+    	<input type="hidden" name="uploader_email" value="">
+    	<input type="hidden" name="recipient_email" value="">
 		<?php else: ?>
 		<input type="password" name="pw" placeholder="<?= $t['password_optional'] ?>" class="password-input"><br>
         <select name="mode">
@@ -61,16 +62,30 @@ require_once 'inc/language.php';
 		}
 		?>
         </select>
+        <?php if (Config::$default['send_email']): ?>
+        <input type="email" name="uploader_email" placeholder="<?= $t['uploader_email'] ?>" required class="email-input">
+		<input type="text" name="recipient_email" placeholder="<?= $t['recipient_email'] ?>" required class="email-input">
+		<?php else: ?>
+		<input type="hidden" name="uploader_email" value="">
+    	<input type="hidden" name="recipient_email" value="">
+		<?php endif; ?>
         <br><br>
+        <?php if (!Config::$default['only_upload'] && !Config::$default['send_email']): ?>
         <button type="submit"><?= $t['upload_button'] ?></button>
 		<?php endif; ?>
+		<?php if (!Config::$default['only_upload'] && Config::$default['send_email']): ?>
+        <button type="submit"><?= $t['upload_button_send_email'] ?></button>
+		<?php endif; ?>
+		<?php endif; ?>
+		<?php if (Config::$default['only_upload']): ?>
+        <button type="submit"><?= $t['upload_button_only_upload'] ?></button>
+        <?php endif; ?>
         <progress id="progressBar" value="0" max="100" style="width:100%; display:none; margin-top:20px;"></progress>
         <div id="progressText" style="margin-top:5px; display:none;"></div>
         <div id="uploadStatusText" style="margin-top:5px; display:none;"></div>
     </form>
-
+    <br><br>
 	<p></p>
-	
 	<footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
     <script src="js/main.js"></script>
 </body>
