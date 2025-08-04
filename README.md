@@ -36,8 +36,6 @@ Version **1.7** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 Try Dropzone File Sharing directly in your browser:  
 🔗 [https://share.kevintobler.ch](https://share.kevintobler.ch)
 
-> Log in with your own WebDAV server credentials to explore its full functionality.
-
 ---
 
 ## 🔧 Installation
