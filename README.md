@@ -27,7 +27,7 @@ Version **1.7** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharing1_5_.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharing1_7_.png)
 
 ---
 
