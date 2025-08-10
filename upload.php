@@ -146,6 +146,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
 			$success = sendSMTPMail($uploader, $subject, $message, $from, $smtpHost, $smtpPort, $smtpUser, $smtpPass);
 
 			// Show link or email-notification
+			$userChoice = $_POST['mailChoice'] ?? 'no';
+			
             if (!Config::$default['only_upload']) {
 				if (!Config::$default['send_email']) {
 					echo $t['your_link'] . " 
@@ -153,14 +155,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
 					<button onclick='copyLink()'>{$t['copy']}</button>
 					<span id='copied' style='color:#4caf50; display:none;'>{$t['copied']}</span>";
 					} else {
-					if ($userChoice === 'yes') {
-                		echo $t['email_sent'];
-                	} else {
-						echo $t['your_link'] . " 
+					echo ($userChoice === 'yes')
+					? $t['email_sent']
+					: $t['your_link'] . " 
 						<a id='link' href='$link' target='_blank'>$link</a>
 						<button onclick='copyLink()'>{$t['copy']}</button>
 						<span id='copied' style='color:#4caf50; display:none;'>{$t['copied']}</span>";
-					}
                 }
             }
         }
