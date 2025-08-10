@@ -62,6 +62,7 @@ form.addEventListener('submit', async (e) => {
 			formData.append('name', name);
 			formData.append('pw', pw);
 			formData.append('mode', mode);
+			formData.append('mailChoice', document.getElementById('mailChoice')?.value || 'no');
 			const isLastFile = (i === files.length - 1 && chunkIndex === totalChunks - 1) ? '1' : '0';
 			formData.append('isLastFile', isLastFile);
 
