@@ -3,6 +3,8 @@ require_once 'inc/config.php';
 require_once 'inc/helpers.php';
 require_once 'inc/language.php';
 
+$userChoice = $_POST['mailChoice'] ?? 'no';
+
 loadEnv($envDir . '/.env');
 
 $smtpHost = getenv('SMTP_HOST');
@@ -151,7 +153,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
 					<button onclick='copyLink()'>{$t['copy']}</button>
 					<span id='copied' style='color:#4caf50; display:none;'>{$t['copied']}</span>";
 					} else {
-                	echo $t['email_sent'];
+					if ($userChoice === 'yes') {
+                		echo $t['email_sent'];
+                	} else {
+						echo $t['your_link'] . " 
+						<a id='link' href='$link' target='_blank'>$link</a>
+						<button onclick='copyLink()'>{$t['copy']}</button>
+						<span id='copied' style='color:#4caf50; display:none;'>{$t['copied']}</span>";
+					}
                 }
             }
         }
