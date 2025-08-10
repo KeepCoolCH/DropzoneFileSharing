@@ -20,6 +20,10 @@ const form = document.getElementById('uploadForm');
 form.addEventListener('submit', async (e) => {
 	e.preventDefault();
 
+	const mailChoiceEl = document.getElementById('mailChoice');
+	const fixedMailChoice = mailChoiceEl ? mailChoiceEl.value : 'no';
+	if (mailChoiceEl) mailChoiceEl.disabled = true;
+
 	const uploaderEmail = form.querySelector('[name="uploader_email"]').value;
 	const recipientEmail = form.querySelector('[name="recipient_email"]').value;
 	const uploadId = [...crypto.getRandomValues(new Uint8Array(8))].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -62,7 +66,7 @@ form.addEventListener('submit', async (e) => {
 			formData.append('name', name);
 			formData.append('pw', pw);
 			formData.append('mode', mode);
-			formData.append('mailChoice', document.getElementById('mailChoice')?.value || 'no');
+			formData.append('mailChoice', fixedMailChoice);
 			const isLastFile = (i === files.length - 1 && chunkIndex === totalChunks - 1) ? '1' : '0';
 			formData.append('isLastFile', isLastFile);
 
