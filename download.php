@@ -50,7 +50,7 @@ if (!empty($info['password'])) {
                 <input type='hidden' name='pw_token' value='" . htmlspecialchars($token) . "'>
                 <input type='password' name='pw_input' placeholder='{$t['enter_password']}' required autofocus>
                 <br><br>
-                <button type='submit'>{$t['start_download']}</button>
+                <button type='submit' style='margin-top: 10px;'>{$t['start_download']}</button>
             </form>
             <br><br>
             <p>$errorMsg</p>
