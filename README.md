@@ -1,13 +1,13 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **1.7** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **1.8** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
-## 🔄 Updates in version 1.7
+## 🔄 Updates in version 1.8
 
-- 📧 Share a unique download link directly to the recipient’s email inbox. Multiple recipients supported.
+- 📧 The user can choose whether to send the files via email or receive the download link.
 
 ---
 
@@ -27,7 +27,7 @@ Version **1.7** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharing1-7.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharing1-8.png)
 
 ---
 
