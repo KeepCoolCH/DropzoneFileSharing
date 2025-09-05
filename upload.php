@@ -24,10 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
     if (!is_dir($chunkBase)) mkdir($chunkBase, 0777, true);
     $chunkPath = "$chunkBase/chunk_$chunkIndex";
 
-    if (!move_uploaded_file($_FILES['chunk']['tmp_name'], $chunkPath)) {
-        http_response_code(500);
-        die($t['upload_error']);
-    }
+	if (isset($_FILES['chunk']) && is_uploaded_file($_FILES['chunk']['tmp_name'])) {
+		if (!move_uploaded_file($_FILES['chunk']['tmp_name'], $chunkPath)) {
+			http_response_code(500);
+			die($t['upload_error']);
+		}
+	}
 
     file_put_contents("$chunkBase/info.txt", $filename);
 
@@ -170,4 +172,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
     exit;
 
 }
+
 
