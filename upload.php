@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
             $zipName = "$token.zip";
             $zipPath = "$uploadDir/$zipName";
             $pw = trim($_POST['pw'] ?? '');
-            $cmd = "cd " . escapeshellarg($tempDir) . " && zip -r -0 " .
+            $cmd = "cd " . escapeshellarg($tempDir) . " && zip -r -0 -ll " .
                 ($pw !== '' ? "-P " . escapeshellarg($pw) : "") . " " .
                 escapeshellarg($zipPath) . " .";
             shell_exec($cmd);
@@ -170,3 +170,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['chunk'])) {
     exit;
 
 }
+
