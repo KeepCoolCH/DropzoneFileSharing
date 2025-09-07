@@ -5,10 +5,11 @@ Version **1.9** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ---
 
-## 🔄 Updates in version 1.9
+## 🔄 Updates in version 2.0
 
-- 📘 New logo, colors and filelist
-- 📱 Responsive design for phones
+- 📘 Completely reworked chunk upload
+- ⚠️ No more errors when uploading very large files
+- 🐞 Other bug fixes
 
 ---
 
@@ -28,7 +29,7 @@ Version **1.9** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV1_9.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-0.png)
 
 ---
 
