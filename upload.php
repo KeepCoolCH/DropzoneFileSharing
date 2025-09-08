@@ -231,10 +231,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         $zipName = "$token.zip";
         $zipPath = "$uploadDir/$zipName";
-        $cmd = "cd " . escapeshellarg($tempDir) . " && zip -r -0 -ll " .
-               ($pw !== '' ? "-P " . escapeshellarg($pw) : "") . " " .
-               escapeshellarg($zipPath) . " .";
-        shell_exec($cmd);
+
+		header('X-Accel-Buffering: no');
+        ini_set('output_buffering', 'off');
+        ini_set('zlib.output_compression', '0');
+        if (function_exists('apache_setenv')) {
+			apache_setenv('no-gzip', '1');
+		}
+        while (ob_get_level() > 0) { ob_end_flush(); }
+        ob_implicit_flush(true);
+
+        $cmd = "cd " . escapeshellarg($tempDir) . " && zip -v -r -0 -ll " .
+               ($pw !== '' ? "-P " . escapeshellarg($pw) . " " : "") .
+               escapeshellarg($zipPath) . " . 2>&1";
+
+        $descriptorspec = [
+            0 => ['pipe', 'r'],  // stdin
+            1 => ['pipe', 'w'],  // stdout
+            2 => ['pipe', 'w'],  // stderr
+        ];
+
+        $proc = proc_open($cmd, $descriptorspec, $pipes);
+        if (!is_resource($proc)) {
+            echo "<!-- ERR cannot start zip -->\n"; flush();
+            exit;
+        }
+        fclose($pipes[0]);
+
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+
+        $lastPing = time();
+        echo "<!-- ZIP start: " . date('H:i:s') . " -->\n"; flush();
+
+        while (true) {
+            $out = fread($pipes[1], 8192);
+            $err = fread($pipes[2], 8192);
+
+            if ($out !== false && $out !== '') {
+                echo "<!-- zip: " . htmlspecialchars(rtrim($out)) . " -->\n";
+            }
+            if ($err !== false && $err !== '') {
+                echo "<!-- zip ERR: " . htmlspecialchars(rtrim($err)) . " -->\n";
+            }
+
+            if (time() - $lastPing >= 10) {
+                echo "<!-- PING " . time() . " -->\n";
+                $lastPing = time();
+            }
+
+            flush();
+
+            $status = proc_get_status($proc);
+            if (!$status['running']) {
+                break;
+            }
+            usleep(150000); // 150 ms
+        }
+
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $exitCode = proc_close($proc);
+
+        if ($exitCode !== 0) {
+            echo "<!-- zip exit code $exitCode -->\n"; flush();
+            exit;
+        }
+
+        echo "<!-- ZIP done: " . date('H:i:s') . " -->\n"; flush();
 
         $fileData = file_exists($dataFile) ? json_decode(file_get_contents($dataFile), true) : [];
         if (!is_array($fileData)) $fileData = [];
@@ -339,3 +403,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     echo "ERR unknown action";
     exit;
 }
+
