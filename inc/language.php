@@ -66,7 +66,7 @@ $T = [
         'verification_success' => "✅ Upload bestätigt. Die Empfänger wurden benachrichtigt.",
         'language' => "Sprache",
         'title' => "Dropzone File Sharing",
-        'version' => "V.2.0",
+        'version' => "V.2.1",
         'footer_text' => "© 2025 von Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
     ],
     'en' => [
@@ -128,7 +128,7 @@ $T = [
 		'verification_success' => "✅ Upload confirmed. The recipients have been notified.",
         'language' => "Language",
         'title' => "Dropzone File Sharing",
-        'version' => "V.2.0",
+        'version' => "V.2.1",
         'footer_text' => "© 2025 by Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
     ],
     'fr' => [
@@ -190,7 +190,7 @@ $T = [
 		'verification_success' => "✅ Téléversement vérifié. Les destinataires ont été notifiés.",
 		'language' => "Langage",
 		'title' => "Dropzone File Sharing",
-		'version' => "V.2.0",
+		'version' => "V.2.1",
 		'footer_text' => "© 2025 par Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
 	],
 	'it' => [
@@ -252,7 +252,7 @@ $T = [
 		'verification_success' => "✅ Caricamento verificato. I destinatari sono stati notificati.",
 		'language' => "Lingua",
 		'title' => "Dropzone File Sharing",
-		'version' => "V.2.0",
+		'version' => "V.2.1",
 		'footer_text' => "© 2025 di Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
 	]
 ];
