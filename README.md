@@ -1,15 +1,13 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **2.0** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **2.1** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
-## 🔄 Updates in version 2.0
+## 🔄 Updates in version 2.1
 
-- 📘 Completely reworked chunk upload
-- ⚠️ No more errors when uploading very large files
-- 🐞 Other bug fixes
+- 📧 The time period for which the file is valid is included in the email to the recipient.
 
 ---
 
@@ -29,7 +27,7 @@ Version **2.0** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-0.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-1.png)
 
 ---
 
