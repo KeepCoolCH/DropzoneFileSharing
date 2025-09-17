@@ -48,6 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($verificationMessage)) {
             if (empty($link) || empty($validRecipients)) {
                 $verificationMessage = "<div class='error'>❌ {$t['verification_recipient_error']}</div>";
             } else {
+				$mode = $fileData[$token]['mode'] ?? 'once';
+				$validText = $t["valid_$mode"] ?? $mode;
                 $subject = "{$t['title']} - {$t['sent_title_recipient']}";
                 $message = "<html><body>
                 {$t['sent_message_recipient1']}
@@ -55,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($verificationMessage)) {
                 {$t['sent_message_recipient2']}
                 {$t['title']}
                 <p><a href='$link'>$link</a></p>
+				<p>$validText</p>
                 </body></html>";
 
                 foreach ($validRecipients as $r) {
