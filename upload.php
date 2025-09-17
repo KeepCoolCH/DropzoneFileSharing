@@ -322,6 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $fileData[$token] = [
             'name' => $zipName,
             'path' => $zipName,
+			'mode'  => $mode,
             'time' => time(),
             'type' => $type,
             'duration' => $duration,
@@ -356,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 			if ($scheme !== 'http' && $scheme !== 'https') {
 				$scheme = 'http';
 			}
-			$verifyUrl = $scheme . '://' . $_SERVER['HTTP_HOST'] . "$basePath/verify.php?email=$encEmail&token=$encToken";
+			$verifyUrl = $scheme . '://' . $_SERVER['HTTP_HOST'] . "$basePath/verify.php?lang=$lang&email=$encEmail&token=$encToken";
 
             $subject = "{$t['title']} - {$t['sent_title_uploader']}";
             $message = "<html><body>
@@ -403,4 +404,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     echo "ERR unknown action";
     exit;
 }
+
 
