@@ -3,6 +3,8 @@ require_once 'inc/config.php';
 
 header('Content-Type: text/plain; charset=utf-8');
 
+$secretToken = 'serverintern';
+
 $ct = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
 if (stripos($ct, 'application/json') !== false) {
     $raw    = file_get_contents('php://input');
@@ -10,6 +12,11 @@ if (stripos($ct, 'application/json') !== false) {
     if (!is_array($input)) $input = [];
 } else {
     $input = $_POST;
+}
+
+if (!isset($input['token']) || $input['token'] !== $secretToken) {
+    http_response_code(403);
+    exit('Forbidden');
 }
 
 $uploadId      = trim($input['uploadId'] ?? '');
