@@ -150,7 +150,8 @@ form.addEventListener('submit', async (e) => {
 		body: JSON.stringify({
 			uploadId,
 			uploader_email: uploaderEmail,
-			recipient_email: recipientEmail
+			recipient_email: recipientEmail,
+			token: "serverintern"
 		})
 	});
 	
@@ -289,7 +290,25 @@ function formatBytes(bytes, decimals = 2) {
     return (bytes / Math.pow(k, i)).toFixed(dm) + ' ' + sizes[i];
 }
 
-function updateSelectedFile() {
+async function checkFreeSpace(totalSize) {
+    try {
+        const res = await fetch("check_disk_space.php");
+        const data = await res.json();
+        const free = data.free || 0;
+
+        if (totalSize > free) {
+            alert(`${t.diskspace_error}\n${t.diskspace_required} ${formatBytes(totalSize)}\n${t.diskspace_free} ${formatBytes(free)}`);
+            return false;
+        } else {
+            return true;
+        }
+    } catch (e) {
+        alert(`${t.diskspace_check_failed}`);
+        return true;
+    }
+}
+
+async function updateSelectedFile() {
     if (fileInput.files.length > 0) {
         const fileArr = Array.from(fileInput.files);
         const { tree, totalSize } = buildTreeWithSizes(fileArr);
@@ -299,6 +318,14 @@ function updateSelectedFile() {
             (fileArr.length > 1 ? t.selected_files_plural : t.selected_files) +
             ":" + renderTree(tree) + totalSizeText;
         selectedFileDiv.classList.add("shown");
+        
+        const ok = await checkFreeSpace(totalSize);
+        if (!ok) {
+            fileInput.value = "";
+            files = [];
+            selectedFileDiv.innerHTML = "";
+            selectedFileDiv.classList.remove("shown");
+        }
     } else {
         selectedFileDiv.innerHTML = "";
         selectedFileDiv.classList.remove("shown");
