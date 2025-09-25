@@ -53,6 +53,18 @@ HTACCESS;
     file_put_contents($htaccessPathUpload, $htaccessContent);
 }
 
+// Generate .htaccess for inc-Folder (deny direct access)
+$htaccessPathInc = $incDir . '/.htaccess';
+if (!file_exists($htaccessPathInc)) {
+    $htaccessContent = <<<HTACCESS
+# Prevent direct access to files
+Order deny,allow
+Deny from all
+HTACCESS;
+
+    file_put_contents($htaccessPathInc, $htaccessContent);
+}
+
 // Generate .htaccess for .env-Folder (deny direct access)
 $htaccessPathEnv = $envDir . '/.htaccess';
 if (!file_exists($htaccessPathEnv)) {
