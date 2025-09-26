@@ -1,13 +1,16 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **2.2** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **2.3** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
 ## 🔄 Changelog
 
 ### 🆕 Version 2.x
+- **2.3**
+  - 🔒 Security improvements  
+  - 🗑️ When the user manually cancels the upload, reloads the page, or closes the browser, temporary files are cleaned up and the entry is removed from the JSON file
 - **2.2**
   - 🔒 Security improvements  
   - 💾 Check for sufficient disk space before upload (error message if too little free space)  
@@ -45,7 +48,7 @@ Version **2.2** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-2.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-3.png)
 
 ---
 
