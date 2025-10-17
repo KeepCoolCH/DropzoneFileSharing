@@ -1,44 +1,44 @@
 <?php
 // Clean up temp files and folder
 function rrmdir($dir) {
-	foreach (scandir($dir) as $item) {
-		if ($item === '.' || $item === '..') continue;
-		$path = $dir . DIRECTORY_SEPARATOR . $item;
-		if (is_dir($path)) rrmdir($path);
-		else unlink($path);
-	}
-	rmdir($dir);
+    foreach (scandir($dir) as $item) {
+        if ($item === '.' || $item === '..') continue;
+        $path = $dir . DIRECTORY_SEPARATOR . $item;
+        if (is_dir($path)) rrmdir($path);
+        else unlink($path);
+    }
+    rmdir($dir);
 }
 
 // Remove expired files
 foreach ($fileData as $token => $info) {
     $type = $info['type'] ?? 'once'; // Standardwert fallback
-	$used = $info['used'] ?? false;
-	$duration = $info['duration'] ?? 3600;
-	$time = $info['time'] ?? 0;
+    $used = $info['used'] ?? false;
+    $duration = $info['duration'] ?? 3600;
+    $time = $info['time'] ?? 0;
 
-	$expired = ($type === 'once' && $used) || ($type === 'time' && $duration > 0 && $now - $time > $duration);
-		if ($expired && file_exists($uploadDir . '/' . $info['path'])) {
-			unlink($uploadDir . '/' . $info['path']);
-			unset($fileData[$token]);
-		}
-	}
-	file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
+    $expired = ($type === 'once' && $used) || ($type === 'time' && $duration > 0 && $now - $time > $duration);
+        if ($expired && file_exists($uploadDir . '/' . $info['path'])) {
+            unlink($uploadDir . '/' . $info['path']);
+            unset($fileData[$token]);
+        }
+    }
+    file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
 
 // Clean up old chunk uploads
 $maxAge = 24 * 3600; // 24 Hours
 foreach (glob($chunksDir . '/*.{part,meta,current}', GLOB_BRACE) as $file) {
-	if (is_file($file) && (time() - filemtime($file) > $maxAge)) {
-		unlink($file);
-	}
+    if (is_file($file) && (time() - filemtime($file) > $maxAge)) {
+        unlink($file);
+    }
 }
 
 // Clean up old staging uploads
 $maxAge = 24 * 3600; // 24 Hours
 foreach (glob("$stagingRoot/*") as $stagingFolder) {
-	if (is_dir($stagingFolder) && time() - filemtime($stagingFolder) > $maxAge) {
-		rrmdir($stagingFolder);
-	}
+    if (is_dir($stagingFolder) && time() - filemtime($stagingFolder) > $maxAge) {
+        rrmdir($stagingFolder);
+    }
 }
 
 // Generate .htaccess for Upload-Folder (deny direct access)
@@ -83,7 +83,7 @@ $envPath = $envDir . '/.env';
 function ensureEnvFileExists(string $envPath): void {
     if (!file_exists($envPath)) {
         $envContent = <<<ENV
-# SMTP Configuration -> Change settings directly in inc/.env-file
+# SMTP Configuration -> Change settings directly in inc/.env/.env-file
 # SMPT Connection must be SSL Port 465
 SMTP_HOST=mail.example.com
 SMTP_PORT=465 
