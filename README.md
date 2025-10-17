@@ -1,13 +1,18 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **2.3** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **2.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
 ## 🔄 Changelog
 
 ### 🆕 Version 2.x
+- **2.4**
+  - ⚙️ Added **Admin Panel** with password-protected setup
+  - 📎 Manage Uploads (change expiration time, change password)
+  - 📥 Download Uploads directly from the **Admin Panel**
+  - 🧹 Delete Uploads directly from the **Admin Panel**
 - **2.3**
   - 🔒 Security improvements  
   - 🗑️ When the user manually cancels the upload, reloads the page, or closes the browser, temporary files are cleaned up and the entry is removed from the JSON file
@@ -43,12 +48,15 @@ Version **2.3** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 - ✨ No database required – pure PHP
 - 🚫 No filesize limit using chunks
 - ✅ Upload with Progress Bar
+- ⚙️ Integrated Admin Panel
 
 ---
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-3.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-4.png)
+
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-4_AdminPanel.png)
 
 ---
 
@@ -64,8 +72,20 @@ Try Dropzone File Sharing directly in your browser:
 1. Upload all files to your web server
 2. If `'send_email' => true` is set in the `config.php`, then the `.env` file must define the `SMTP server`, `SMTP port`, `username`, and `password`.
 3. Open the application in your browser
+4. Access `/admin.php` to create your admin credentials
 
 > ⚠️ Requires PHP 7.4 or higher. No database needed.
+
+---
+
+## 🧭 Admin Panel
+
+The **Admin Panel** provides a secure management interface for your **Dropzone File Sharing** installation.
+
+### 🔐 Login & Setup Admin Panel
+- First-time access via `/admin.php` triggers **Admin Setup** (username + password creation)
+- Credentials are stored securely (hashed) in `.admin.json` and secured with `.htaccess`
+- After setup, login via the **Admin Login** form in `/admin.php`
 
 ---
 
@@ -90,6 +110,10 @@ You can configure the following options:
 - `'valid_xx' => true/false`: Control link expiration options
 - `'onlyupload' => true/false`: Disable password protection and only allow upload without generating a link with the setting "true" (only admin can download files from the upload folder)
 - `'send_email' => true/false`: Enable/Disable email sending (⚠️ make sure to update the `.env` file when enabled).
+- `'pwzip' => true/false`: Enable/Disable password protection for the zip file itself. If false, only the download is password-protected, not the ZIP file.
+- `'timezone' => 'Europe/Zurich'`: Change timezone to your preference (e.g. `America/New_York`, `Asia/Tokyo`, `UTC`, `Etc/GMT+1`)
+
+> 💡 Full list of valid timezones: [https://www.php.net/manual/en/timezones.php](https://www.php.net/manual/en/timezones.php)
 
 > ⚠️ Changes take effect automatically on the next page load.
 
@@ -100,6 +124,7 @@ You can configure the following options:
 - Each upload can be protected with a custom password  
 - Option to allow only a **single download** or multiple downloads  
 - Files are automatically deleted after the expiration time
+- Passwords are **never stored in plain text**
 
 ---
 
