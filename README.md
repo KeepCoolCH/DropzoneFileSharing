@@ -55,7 +55,6 @@ Version **2.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 ## 📸 Screenshot
 
 ![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-4.png)
-
 ![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-4_AdminPanel.png)
 
 ---
