@@ -107,21 +107,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         header('Content-Type: text/plain; charset=UTF-8');
         
         // --- Save key into fileData for cleanup ---
-				$fileData = file_exists($dataFile) ? json_decode(file_get_contents($dataFile), true) : [];
-				if (!isset($fileData[$uploadId])) {
-						$fileData[$uploadId] = [
-								'uploader_email'  => '',
-								'recipient_email' => [],
-								'keys'            => []
-						];
-				}
-				if (!isset($fileData[$uploadId]['keys']) || !is_array($fileData[$uploadId]['keys'])) {
-						$fileData[$uploadId]['keys'] = [];
-				}
-				if (!in_array($key, $fileData[$uploadId]['keys'])) {
-						$fileData[$uploadId]['keys'][] = $key;
-						file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
-				}
+        $fileData = file_exists($dataFile) ? json_decode(file_get_contents($dataFile), true) : [];
+        if (!isset($fileData[$uploadId])) {
+            $fileData[$uploadId] = [
+                'uploader_email'  => '',
+                'recipient_email' => [],
+                'keys'            => []
+                ];
+            }
+            if (!isset($fileData[$uploadId]['keys']) || !is_array($fileData[$uploadId]['keys'])) {
+                $fileData[$uploadId]['keys'] = [];
+            }
+            if (!in_array($key, $fileData[$uploadId]['keys'])) {
+                $fileData[$uploadId]['keys'][] = $key;
+                file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
+            }
 
         if (!isset($_FILES['chunk'])) { echo "ERR no chunk field"; exit; }
         if ((int)$_FILES['chunk']['error'] !== UPLOAD_ERR_OK) {
@@ -223,43 +223,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         mkdir($tempDir, 0777, true);
 
         // Move staging → tempDir (without .complete.json)
-				$it = new RecursiveIteratorIterator(
-						new RecursiveDirectoryIterator($stagingDir, FilesystemIterator::SKIP_DOTS),
-					RecursiveIteratorIterator::CHILD_FIRST
-				);
-				foreach ($it as $path => $info) {
-						$basename = basename($path);
-						if ($basename === '.complete.json') {
-								@unlink($path);
-								continue;
-						}
-						$rel = substr($path, strlen($stagingDir) + 1);
-						$dst = $tempDir . '/' . $rel;
-						if ($info->isDir()) {
-								if (!is_dir($dst)) mkdir($dst, 0777, true);
-						} else {
-								$dstDir = dirname($dst);
-								if (!is_dir($dstDir)) mkdir($dstDir, 0777, true);
-										rename($path, $dst);
-								}
-						}
-		
-				@unlink($tempDir . '/.complete.json');
+        $it = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($stagingDir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($it as $path => $info) {
+                $basename = basename($path);
+                if ($basename === '.complete.json') {
+                        @unlink($path);
+                        continue;
+                }
+                $rel = substr($path, strlen($stagingDir) + 1);
+                $dst = $tempDir . '/' . $rel;
+                if ($info->isDir()) {
+                        if (!is_dir($dst)) mkdir($dst, 0777, true);
+                } else {
+                        $dstDir = dirname($dst);
+                        if (!is_dir($dstDir)) mkdir($dstDir, 0777, true);
+                                rename($path, $dst);
+                        }
+                }
+
+        @unlink($tempDir . '/.complete.json');
 
         $zipName = "$token.zip";
         $zipPath = "$uploadDir/$zipName";
+        if (Config::$default['pwzip']):
+        $pwzip = "$pw";
+        else:
+        $pwzip = "";
+        endif;
 
         header('X-Accel-Buffering: no');
         ini_set('output_buffering', 'off');
         ini_set('zlib.output_compression', '0');
         if (function_exists('apache_setenv')) {
-						apache_setenv('no-gzip', '1');
-				}
+                apache_setenv('no-gzip', '1');
+        }
         while (ob_get_level() > 0) { ob_end_flush(); }
         ob_implicit_flush(true);
 
         $cmd = "cd " . escapeshellarg($tempDir) . " && zip -v -r -0 -ll " .
-               ($pw !== '' ? "-P " . escapeshellarg($pw) . " " : "") .
+               ($pwzip !== '' ? "-P " . escapeshellarg($pwzip) . " " : "") .
                escapeshellarg($zipPath) . " . 2>&1";
 
         $descriptorspec = [
@@ -347,13 +352,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             'password' => $pw !== '' ? password_hash($pw, PASSWORD_DEFAULT) : null
         ];
 
-		$basePath = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-		if ($basePath === '/' || $basePath === '\\') $basePath = '';
-		$scheme = $_SERVER['REQUEST_SCHEME'] ?? '';
-		if ($scheme !== 'http' && $scheme !== 'https') {
-			$scheme = 'http';
-		}
-		$link = $scheme . '://' . $_SERVER['HTTP_HOST'] . $basePath . "/?lang=$lang&t=$token";
+        $basePath = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+        if ($basePath === '/' || $basePath === '\\') $basePath = '';
+        $scheme = $_SERVER['REQUEST_SCHEME'] ?? '';
+        if ($scheme !== 'http' && $scheme !== 'https') {
+            $scheme = 'http';
+        }
+        $link = $scheme . '://' . $_SERVER['HTTP_HOST'] . $basePath . "/?lang=$lang&t=$token";
         
         $fileData[$token]['link'] = $link;
 
@@ -371,10 +376,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $encEmail  = encrypt($uploader, $secretKey);
             $encToken  = encrypt($token, $secretKey);
             $scheme = $_SERVER['REQUEST_SCHEME'] ?? '';
-			if ($scheme !== 'http' && $scheme !== 'https') {
-				$scheme = 'http';
-			}
-			$verifyUrl = $scheme . '://' . $_SERVER['HTTP_HOST'] . "$basePath/verify.php?lang=$lang&email=$encEmail&token=$encToken";
+            if ($scheme !== 'http' && $scheme !== 'https') {
+                $scheme = 'http';
+            }
+            $verifyUrl = $scheme . '://' . $_SERVER['HTTP_HOST'] . "$basePath/verify.php?lang=$lang&email=$encEmail&token=$encToken";
 
             $subject = "{$t['title']} - {$t['sent_title_uploader']}";
             $message = "<html><body>
@@ -386,7 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             sendSMTPMail($uploader, $subject, $message, $from, $smtpHost, $smtpPort, $smtpUser, $smtpPass);
         }
 
-		// Confirmation link
+        // Confirmation link
         if (!Config::$default['only_upload']) {
             header('Content-Type: text/html; charset=UTF-8');
             if (!Config::$default['send_email']) {
@@ -407,7 +412,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             echo "COMPLETE";
         }
 
-		// Cleanup
+        // Cleanup
         @rrmdir($stagingDir);
         @rrmdir($tempDir);
         @unlink($metaPath);
@@ -416,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         exit;
     }
 
-	// Errors for unknown actions
+    // Errors for unknown actions
     header('Content-Type: text/plain; charset=UTF-8');
     echo "ERR unknown action";
     exit;
