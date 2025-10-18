@@ -186,14 +186,13 @@ if (!$admin) {
     </form>
 </div>
 <footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
-<!-- START: Invisible form not needed in the admin panel because of main.js-->
-<form id="uploadForm" style="display:none;" aria-hidden="true" novalidate>
-  <input type="file" id="fileInput" style="display:none;">
-  <div id="dropzone" style="display:none;"></div>
-  <div id="selectedFile" style="display:none;"></div>
-</form>
-<!-- END: Invisible form not needed in the admin panel because of main.js-->
-<script src="js/main.js"></script>
+<script>
+function changeLang(lang) {
+    const url = new URL(window.location);
+    url.searchParams.set('lang', lang);
+    window.location = url.toString();
+}
+</script>
 </body>
 </html>
 <?php exit;
@@ -252,14 +251,13 @@ if(empty($_SESSION['logged_in'])){
     </form>
 </div>
 <footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
-<!-- START: Invisible form not needed in the admin panel because of main.js-->
-<form id="uploadForm" style="display:none;" aria-hidden="true" novalidate>
-  <input type="file" id="fileInput" style="display:none;">
-  <div id="dropzone" style="display:none;"></div>
-  <div id="selectedFile" style="display:none;"></div>
-</form>
-<!-- END: Invisible form not needed in the admin panel because of main.js-->
-<script src="js/main.js"></script>
+<script>
+function changeLang(lang) {
+    const url = new URL(window.location);
+    url.searchParams.set('lang', lang);
+    window.location = url.toString();
+}
+</script>
 </body>
 </html>
 <?php exit;
@@ -521,15 +519,13 @@ $entries=read_json(FILEDATA_JSON,[]);
     </div>
     </div>
 <footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
-<!-- START: Invisible form not needed in the admin panel because of main.js-->
-<form id="uploadForm" style="display:none;" aria-hidden="true" novalidate>
-  <input type="file" id="fileInput" style="display:none;">
-  <div id="dropzone" style="display:none;"></div>
-  <div id="selectedFile" style="display:none;"></div>
-</form>
-<!-- END: Invisible form not needed in the admin panel because of main.js-->
-<script src="js/main.js"></script>
 <script>
+function changeLang(lang) {
+    const url = new URL(window.location);
+    url.searchParams.set('lang', lang);
+    window.location = url.toString();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
   const TEXT_SHOW_UPLOADS = "<?= addslashes($t['show_uploads_button']) ?>";
