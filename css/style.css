@@ -25,6 +25,13 @@ logoimg {
     z-index: 9999;
 }
 
+hr {
+  height: 2px;
+  background: #ccc;
+  border: none;
+  margin-top: 20px;
+}
+
 body.admin #main {
   display: block;
   width: 100%;
@@ -34,22 +41,116 @@ body.admin #main {
 
 body.admin #form {
   width: 100%;
-  max-width: none;
-  margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
 }
 
-table {
-  width:100%;
-  border-collapse:collapse;
-  background:rgba(255,255,255,0.85)
-}
+/* 📱 Desktop-view */
+  .table-responsive table {
+    display: block;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #fff;
+    text-align: left;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
 
-th,td {
-  border:1px solid #ccc;
-  padding:8px
-  text-align:left;
+  .table-responsive tbody {
+    border-bottom: 1px solid #ccc;
+  }
+
+  .table-responsive th {
+    padding: 10px;
+  }
+  
+  .table-responsive tr {
+    border-bottom: 1px solid #ccc;
+  }
+
+  .table-responsive td {
+    border: none;
+    padding: 10px;
+  }
+
+  .table-responsive select,
+  .table-responsive input[type="text"],
+  .table-responsive button {
+    max-width: 100%;
+    margin-top: 20px;
+    margin-bottom: 0px;
+  }
+
+
+/* 📱 Mobile Card-view */
+@media (max-width: 1600px) {
+  .table-responsive table {
+    display: block;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #fff;
+    text-align: left;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+    
+  .table-responsive tbody,
+  .table-responsive tr,
+  .table-responsive td {
+    display: block;
+    border: none;
+    background: #fff;
+  }
+
+  .table-responsive th {
+  }
+
+  .table-responsive thead {
+    display: none;
+  }
+
+  .table-responsive tr {
+    background: #fff;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+
+  .table-responsive td {
+    display: block;
+    justify-content: space-between;
+    align-items: flex;
+    padding: 10px;
+    white-space: normal;
+    word-break: break-word;
+    background: #fff;
+  }
+
+  .table-responsive tr td:last-child {
+    border-bottom: none;
+  }
+
+  .table-responsive td::before {
+    content: attr(data-label);
+    flex-basis: 50%;
+    font-weight: bold;
+    padding-right: 10px;
+  }
+
+  .table-responsive td * {
+    max-width: 100%;
+  }
+
+  .table-responsive form {
+    width: 100%;
+  }
+
+  .table-responsive select,
+  .table-responsive input[type="text"],
+  .table-responsive button {
+    width: 100%;
+  }
 }
 
 #main {
