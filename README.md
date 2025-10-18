@@ -1,13 +1,18 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **2.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **2.5** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
 ## 🔄 Changelog
 
 ### 🆕 Version 2.x
+- **2.5**
+  - ⚙️ Improved **Admin Panel** with configuration and email settings
+  - 🧭 Clearer navigation and visual refinements in the **Admin Panel**
+  - 📱 Fully responsive redesign of the **Admin Panel** for mobile devices
+  - 🔍 Integrated search function for uploads
 - **2.4**
   - ⚙️ Added **Admin Panel** with password-protected setup
   - 📎 Manage Uploads (change expiration time, change password)
@@ -48,14 +53,15 @@ Version **2.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 - ✨ No database required – pure PHP
 - 🚫 No filesize limit using chunks
 - ✅ Upload with Progress Bar
-- ⚙️ Integrated Admin Panel
+- ⚙️ Integrated Admin Panel with configuration and email settings
+- 🔍 Search uploads with filename, filesize, date or email
 
 ---
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-4.png)
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-4_AdminPanel.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-5.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-5_AdminPanel.png)
 
 ---
 
@@ -69,9 +75,10 @@ Try Dropzone File Sharing directly in your browser:
 ## 🔧 Installation
 
 1. Upload all files to your web server
-2. If `'send_email' => true` is set in the `config.php`, then the `.env` file must define the `SMTP server`, `SMTP port`, `username`, and `password`.
-3. Open the application in your browser
-4. Access `/admin.php` to create your admin credentials
+2. Open the application in your browser
+3. Access `/admin.php` to create your admin credentials
+4. Choose your desired configuration values in the **Admin Panel**
+5. When `send_email` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password` in the **Admin Panel**
 
 > ⚠️ Requires PHP 7.4 or higher. No database needed.
 
@@ -85,6 +92,7 @@ The **Admin Panel** provides a secure management interface for your **Dropzone F
 - First-time access via `/admin.php` triggers **Admin Setup** (username + password creation)
 - Credentials are stored securely (hashed) in `.admin.json` and secured with `.htaccess`
 - After setup, login via the **Admin Login** form in `/admin.php`
+- Setup your desired configuration values and when `send_email` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password`
 
 ---
 
@@ -103,18 +111,14 @@ https://example.com/index.php?lang=it
 
 ## ⚙️ Configuration
 
-You can configure the following options:
+You can configure the following options in the **Admin Panel**:
 
-- `'lang_default' => 'de'`: Default language (e.g. 'de', 'en', 'fr' or 'it')
-- `'valid_xx' => true/false`: Control link expiration options
-- `'onlyupload' => true/false`: Disable password protection and only allow upload without generating a link with the setting "true" (only admin can download files from the upload folder)
-- `'send_email' => true/false`: Enable/Disable email sending (⚠️ make sure to update the `.env` file when enabled).
-- `'pwzip' => true/false`: Enable/Disable password protection for the zip file itself. If false, only the download is password-protected, not the ZIP file.
-- `'timezone' => 'Europe/Zurich'`: Change timezone to your preference (e.g. `America/New_York`, `Asia/Tokyo`, `UTC`, `Etc/GMT+1`)
-
-> 💡 Full list of valid timezones: [https://www.php.net/manual/en/timezones.php](https://www.php.net/manual/en/timezones.php)
-
-> ⚠️ Changes take effect automatically on the next page load.
+- Choose default language (e.g. 'de', 'en', 'fr' or 'it')
+- Set the timezone according to your preference
+- Control link expiration options
+- Enable/Disable `only_upload` mode without generating a link
+- Enable/Disable `send_email` mode (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password`).
+- Enable/Disable `pwzip` mode for password protection of the zip file itself. If deactivated, only the download is password-protected, not the ZIP file (⚠️ ZIP password cannot be modified).
 
 ---
 
