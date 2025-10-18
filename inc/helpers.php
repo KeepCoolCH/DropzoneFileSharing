@@ -45,9 +45,20 @@ foreach (glob("$stagingRoot/*") as $stagingFolder) {
 $htaccessPathUpload = $uploadDir . '/.htaccess';
 if (!file_exists($htaccessPathUpload)) {
     $htaccessContent = <<<HTACCESS
-# Prevent direct access to files
-Order deny,allow
-Deny from all
+# Prevent direct access to internal files
+# Works for Apache 2.2 and Apache 2.4+
+
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+  Order deny,allow
+  Deny from all
+</IfModule>
+
+# Optional: disable directory listing just in case
+Options -Indexes
 HTACCESS;
 
     file_put_contents($htaccessPathUpload, $htaccessContent);
@@ -57,9 +68,20 @@ HTACCESS;
 $htaccessPathInc = $incDir . '/.htaccess';
 if (!file_exists($htaccessPathInc)) {
     $htaccessContent = <<<HTACCESS
-# Prevent direct access to files
-Order deny,allow
-Deny from all
+# Prevent direct access to internal files
+# Works for Apache 2.2 and Apache 2.4+
+
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+  Order deny,allow
+  Deny from all
+</IfModule>
+
+# Optional: disable directory listing just in case
+Options -Indexes
 HTACCESS;
 
     file_put_contents($htaccessPathInc, $htaccessContent);
@@ -69,9 +91,20 @@ HTACCESS;
 $htaccessPathEnv = $envDir . '/.htaccess';
 if (!file_exists($htaccessPathEnv)) {
     $htaccessContent = <<<HTACCESS
-# Prevent direct access to files
-Order deny,allow
-Deny from all
+# Prevent direct access to internal files
+# Works for Apache 2.2 and Apache 2.4+
+
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+  Order deny,allow
+  Deny from all
+</IfModule>
+
+# Optional: disable directory listing just in case
+Options -Indexes
 HTACCESS;
 
     file_put_contents($htaccessPathEnv, $htaccessContent);
@@ -83,8 +116,7 @@ $envPath = $envDir . '/.env';
 function ensureEnvFileExists(string $envPath): void {
     if (!file_exists($envPath)) {
         $envContent = <<<ENV
-# SMTP Configuration -> Change settings directly in inc/.env/.env-file
-# SMPT Connection must be SSL Port 465
+# SMTP Configuration
 SMTP_HOST=mail.example.com
 SMTP_PORT=465 
 SMTP_USER=noreply@example.com
