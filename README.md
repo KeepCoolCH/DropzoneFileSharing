@@ -1,13 +1,16 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **2.5** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **2.6** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
 ## 🔄 Changelog
 
 ### 🆕 Version 2.x
+- **2.6**
+  - 📊 Download tracking added (download counter + last download timestamp)
+  - 👁️ Display of “Downloads” and “Last Download” directly in the **Admin Panel**
 - **2.5**
   - ⚙️ Improved **Admin Panel** with configuration and email settings
   - 🧭 Clearer navigation and visual refinements in the **Admin Panel**
@@ -60,8 +63,8 @@ Version **2.5** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-5.png)
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-5_AdminPanel.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-6.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-6_AdminPanel.png)
 
 ---
 
