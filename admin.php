@@ -278,6 +278,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     elseif(isset($_POST['validity_path'],$_POST['validity_mode'])){
         $path=$_POST['validity_path']; $mode=$_POST['validity_mode'];
         $presets=[
+            'once'    => 86400,
             '1h' => 3600,
             '3h' => 3 * 3600,
             '6h' => 6 * 3600,
@@ -292,8 +293,13 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
         foreach($data as &$e){
             if(($e['path']??'') === $path){
                 $e['mode'] = $mode;
-                $e['type'] = $mode;
-                $e['duration'] = $presets[$mode] ?? 86400;
+                if ($mode === 'once') {
+                    $e['type'] = 'once';
+                    $e['duration'] = $presets[$mode] ?? 86400;
+                } else {
+                    $e['type'] = 'time';
+                    $e['duration'] = $presets[$mode] ?? 86400;
+                }
             }
         }
         write_json(FILEDATA_JSON,$data); $notice=$t['mode_change'] . "$mode.";
