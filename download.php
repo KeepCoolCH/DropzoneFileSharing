@@ -68,8 +68,17 @@ if (!empty($info['password'])) {
 // mark Download
 if ($info['type'] === 'once') {
     $fileData[$token]['used'] = true;
-    file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
 }
+
+// tracking Download
+if (!isset($fileData[$token]['downloads'])) {
+    $fileData[$token]['downloads'] = 0;
+}
+
+$fileData[$token]['downloads'] += 1;
+$fileData[$token]['last_download'] = time();
+file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
+
 
 header('Content-Description: File Transfer');
 header('Content-Type: application/octet-stream');
