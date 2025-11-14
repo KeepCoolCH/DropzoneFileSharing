@@ -12,7 +12,7 @@ function rrmdir($dir) {
 
 // Remove expired files
 foreach ($fileData as $token => $info) {
-    $type = $info['type'] ?? 'once'; // Standardwert fallback
+    $type = $info['type'] ?? 'once'; // fallback
     $used = $info['used'] ?? false;
     $duration = $info['duration'] ?? 3600;
     $time = $info['time'] ?? 0;
