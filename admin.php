@@ -370,7 +370,7 @@ $entries=read_json(FILEDATA_JSON,[]);
         <table>
             <thead>
             <tr>
-                <th style="width: 200px;"><?= $t['th_file'] ?></th><th style="width: 60px;"><?= $t['th_size'] ?></th><th style="width: 100px;"><?= $t['th_uploaddate'] ?></th><th style="width: 100px;"><?= $t['th_expirationdate'] ?></th><th><?= $t['th_mode'] ?></th><th style="width: 60px;"><?= $t['th_status'] ?></th><th><?= $t['th_password'] ?></th><th style="min-width: 200px;"><?= $t['th_email'] ?></th><th style="width: 160px;"><?= $t['th_actions'] ?></th>
+                <th style="width: 200px;"><?= $t['th_file'] ?></th><th style="width: 60px;"><?= $t['th_size'] ?></th><th style="width: 100px;"><?= $t['th_uploaddate'] ?></th><th style="width: 100px;"><?= $t['th_expirationdate'] ?></th><th><?= $t['th_mode'] ?></th><th style="width: 110px;"><?= $t['th_status'] ?></th><th><?= $t['th_password'] ?></th><th style="min-width: 200px;"><?= $t['th_email'] ?></th><th style="width: 160px;"><?= $t['th_actions'] ?></th>
             </tr>
             </thead>
             <tr>
@@ -401,7 +401,7 @@ $entries=read_json(FILEDATA_JSON,[]);
                     <button type="submit"><?= $t['save_button'] ?></button>
                 </form>
                 </td>
-                <td data-label="<?= $t['th_status'] ?>"><?=($ver?$t['verified']:$t['notverified'])?></td>
+                <td data-label="<?= $t['th_status'] ?>"><?=($ver?$t['verified']:$t['notverified'])?><br><br><?= $e['downloads'] ?? 0 ?><br><br><?= tsfmt($e['last_download']) ?></td>
                 <td data-label="<?= $t['th_password'] ?>">
                     <?=$pw?$t['password_set']:$t['password_notset']?>
                     <form method="post">
