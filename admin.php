@@ -269,9 +269,9 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     $data=read_json(FILEDATA_JSON,[]);
     if(isset($_POST['delete_path'])){
         $path=$_POST['delete_path']; $new=[];
-        foreach($data as $e){
-            if(($e['path']??'')===$path){ $abs=safe_uploads_join($path); if($abs) @unlink($abs); }
-            else $new[]=$e;
+        foreach ($data as $key => $e) {
+        if (($e['path'] ?? '') === $path) { $abs=safe_uploads_join($path); if($abs) @unlink($abs); }
+            else $new[$key]=$e;
         }
         write_json(FILEDATA_JSON,$new); $notice=$t['entry_delete'];
     }
