@@ -391,6 +391,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             sendSMTPMail($uploader, $subject, $message, $from, $smtpHost, $smtpPort, $smtpUser, $smtpPass);
         }
 
+        if (!empty(Config::$default['admin_notify'])) {
+            $adminMail = Config::$default['admin_email'] ?? '';
+
+            if ($adminMail !== '') {
+                $subjectAdmin = "{$t['title']} - {$t['sent_title_admin']}";
+                $messageAdmin = "<html><body>
+                    <h3>{$t['sent_title_admin']}</h3>
+                    <p><strong>{$t['token']}:</strong> $token</p>
+                    <p><strong>{$t['file']}:</strong> $zipName</p>
+                    <p><strong>{$t['uploader']}:</strong> " . htmlspecialchars($uploader) . "</p>
+                    <p><strong>{$t['recipient']}:</strong> " . htmlspecialchars(is_array($recipient) ? implode(', ', $recipient) : $recipient) . "</p>
+                    <p>{$t['sent_message_admin']}</p>
+                </body></html>";
+
+                sendSMTPMail($adminMail, $subjectAdmin, $messageAdmin, $from, $smtpHost, $smtpPort, $smtpUser, $smtpPass);
+            }
+        }
+
         // Confirmation link
         if (!Config::$default['only_upload']) {
             header('Content-Type: text/html; charset=UTF-8');
