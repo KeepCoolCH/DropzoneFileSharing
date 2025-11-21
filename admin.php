@@ -444,7 +444,7 @@ $entries=read_json(FILEDATA_JSON,[]);
     <?php if (!empty($config_message)) echo "<p style='color:green'>$config_message</p>"; ?>
         <?php if (!empty($config_message)): ?>
         <script>
-        setTimeout(() => location.reload(), 1500);
+        setTimeout(() => location.reload(), 3000);
         </script>
         <?php endif; ?>
         <form method="post">
@@ -464,6 +464,10 @@ $entries=read_json(FILEDATA_JSON,[]);
                 }
                 ?>
             </select>
+                <label style="display:block; margin-top: 10px; margin-bottom:20px;">
+                    <?= $t['admin_email_title'] ?>:
+                </label>
+                <input type="email" name="admin_email" placeholder="<?= $t['admin_email_title'] ?>" value="<?= htmlspecialchars($configData['admin_email'] ?? '') ?>" style="width:100%;">
 
             <?php
             $boolKeys = [
@@ -480,6 +484,7 @@ $entries=read_json(FILEDATA_JSON,[]);
                 'valid_forever'  => $t['valid_forever'],
                 'only_upload'    => $t['only_upload_mode'],
                 'send_email'     => $t['send_email_mode'],
+                'admin_notify'   => $t['admin_notify_mode'],
                 'pwzip'          => $t['pwzip_mode'],
                 ];
             ?>
@@ -500,7 +505,7 @@ $entries=read_json(FILEDATA_JSON,[]);
     <?php if (!empty($env_message)) echo "<p style='color:green'>$env_message</p>"; ?>
         <?php if (!empty($env_message)): ?>
         <script>
-        setTimeout(() => location.reload(), 1500);
+        setTimeout(() => location.reload(), 3000);
         </script>
         <?php endif; ?>
         <form method="post">
