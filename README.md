@@ -1,13 +1,17 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **2.6** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **2.7** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
 ## 🔄 Changelog
 
 ### 🆕 Version 2.x
+- **2.7**
+  - 📧 Added optional **Admin email notifications** for new uploads
+  - 📝 Admin email address configuration directly in the **Admin Panel**
+  - ⚙️ Added new toggle **Admin Notify** in configuration settings
 - **2.6**
   - 📊 Download tracking added (download counter + last download timestamp)
   - 👁️ Display of “Downloads” and “Last Download” directly in the **Admin Panel**
@@ -63,8 +67,8 @@ Version **2.6** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-6.png)
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-6_AdminPanel2.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-7.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-7_AdminPanel.png)
 
 ---
 
@@ -81,7 +85,7 @@ Try Dropzone File Sharing directly in your browser:
 2. Open the application in your browser
 3. Access `/admin.php` to create your admin credentials
 4. Choose your desired configuration values in the **Admin Panel**
-5. When `send_email` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password` in the **Admin Panel**
+5. When `send_email` or `admin_notify` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password` in the **Admin Panel**
 
 > ⚠️ Requires PHP 7.4 or higher. No database needed.
 
@@ -95,7 +99,7 @@ The **Admin Panel** provides a secure management interface for your **Dropzone F
 - First-time access via `/admin.php` triggers **Admin Setup** (username + password creation)
 - Credentials are stored securely (hashed) in `.admin.json` and secured with `.htaccess`
 - After setup, login via the **Admin Login** form in `/admin.php`
-- Setup your desired configuration values and when `send_email` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password`
+- Setup your desired configuration values and when `send_email` or `admin_notify` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password`
 
 ---
 
@@ -121,6 +125,7 @@ You can configure the following options in the **Admin Panel**:
 - Control link expiration options
 - Enable/Disable `only_upload` mode without generating a link
 - Enable/Disable `send_email` mode (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password`).
+- Enable/Disable `admin_notify` mode for upload notifications (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password`).
 - Enable/Disable `pwzip` mode for password protection of the zip file itself. If deactivated, only the download is password-protected, not the ZIP file (⚠️ ZIP password cannot be modified).
 
 ---
