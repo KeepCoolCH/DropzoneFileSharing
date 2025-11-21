@@ -22,6 +22,7 @@ class Config {
     public static $default =   [
     'lang_default' => 'de',
     'timezone' => 'Europe/Zurich',
+    'admin_email' => 'you@example.com',
     'valid_once' => true,
     'valid_1h' => true,
     'valid_3h' => true,
@@ -35,6 +36,7 @@ class Config {
     'valid_forever' => true,
     'only_upload' => false,
     'send_email' => false,
+    'admin_notify' => false,
     'pwzip' => false,
   ];
 }
