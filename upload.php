@@ -176,6 +176,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     // ---- FINALIZE ----
     if ($action === 'finalize') {
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(0);
+        }
+        if (function_exists('ini_set')) {
+            @ini_set('memory_limit', '512M');
+        }
         $received  = $meta_read($metaPath);
         $totalSize = $bi_norm((string)$totalSizeIn);
         $canFinalize = ($totalSize !== '0' && $bi_cmp($received, $totalSize) >= 0);
@@ -444,3 +450,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     echo "ERR unknown action";
     exit;
 }
+
