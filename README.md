@@ -91,6 +91,8 @@ Start the container:
 docker run -d \
   --name dropzonefilesharing \
   -p 8080:80 \
+  --dns 1.1.1.1 \
+  --dns 8.8.8.8 \
   keepcoolch/dropzonefilesharing:latest
 ```
 
