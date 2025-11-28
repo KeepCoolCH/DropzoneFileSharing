@@ -407,7 +407,7 @@ $entries=read_json(FILEDATA_JSON,[]);
                     <button type="submit"><?= $t['save_button'] ?></button>
                 </form>
                 </td>
-                <td data-label="<?= $t['th_status'] ?>"><?=($ver?$t['verified']:$t['notverified'])?><br><br><?= $e['downloads'] ?? 0 ?><br><br><?= tsfmt($e['last_download']) ?></td>
+                <td data-label="<?= $t['th_status'] ?>"><?=($ver?$t['verified']:$t['notverified'])?><br><br><?= $e['downloads'] ?? 0 ?><br><br><?= tsfmt($e['last_download'] ?? null) ?></td>
                 <td data-label="<?= $t['th_password'] ?>">
                     <?=$pw?$t['password_set']:$t['password_notset']?>
                     <form method="post">
