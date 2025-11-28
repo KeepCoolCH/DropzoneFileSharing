@@ -104,7 +104,7 @@ Uploads, settings, JSON files etc. are stored inside the container.
 
 ---
 
-## 🔧 Manuarl Installation (non-Docker)
+## 🔧 Manual Installation (non-Docker)
 
 1. Upload all files to your web server
 2. Open the application in your browser
