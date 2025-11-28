@@ -182,6 +182,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if (function_exists('ini_set')) {
             @ini_set('memory_limit', '512M');
         }
+
+        $onlyUpload = Config::$default['only_upload'] ?? false;
+        if ($onlyUpload) {
+            header('Content-Type: text/plain; charset=UTF-8');
+        } else {
+            header('Content-Type: text/html; charset=UTF-8');
+        }
+        
         $received  = $meta_read($metaPath);
         $totalSize = $bi_norm((string)$totalSizeIn);
         $canFinalize = ($totalSize !== '0' && $bi_cmp($received, $totalSize) >= 0);
@@ -417,7 +425,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         // Confirmation link
         if (!Config::$default['only_upload']) {
-            header('Content-Type: text/html; charset=UTF-8');
             if (!Config::$default['send_email']) {
                 echo $t['your_link'] . " 
                 <a id='link' href='$link' target='_blank'>$link</a><br><br>
@@ -432,7 +439,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         <span id='copied' style='display:none;'><br><br>{$t['copied']}</span><br><br><br>";
             }
         } else {
-            header('Content-Type: text/plain; charset=UTF-8');
             echo "COMPLETE";
         }
 
@@ -450,4 +456,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     echo "ERR unknown action";
     exit;
 }
-
