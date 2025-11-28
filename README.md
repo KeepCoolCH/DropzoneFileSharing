@@ -90,6 +90,7 @@ Start the container:
 ```bash
 docker run -d \
   --name dropzonefilesharing \
+  --restart=unless-stopped \
   -p 8080:80 \
   --dns 1.1.1.1 \
   --dns 8.8.8.8 \
