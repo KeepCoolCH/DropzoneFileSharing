@@ -79,7 +79,29 @@ Try Dropzone File Sharing directly in your browser:
 
 ---
 
-## 🔧 Installation
+## 🐳 Docker Installation (Version 2.7)
+Dropzone File Sharing **v2.7** is available as a Docker image:
+
+```bash
+docker pull keepcoolch/dropzonefilesharing:latest
+```
+
+Start the container:
+```bash
+docker run -d \
+  --name dropzonefilesharing \
+  -p 8080:80 \
+  keepcoolch/dropzonefilesharing:latest
+```
+
+Then open:
+👉 http://localhost:8080
+
+Uploads, settings, JSON files etc. are stored inside the container.
+
+---
+
+## 🔧 Manuarl Installation (non-Docker)
 
 1. Upload all files to your web server
 2. Open the application in your browser
