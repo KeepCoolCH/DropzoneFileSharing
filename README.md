@@ -1,13 +1,21 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **2.7** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **2.8** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
 ## 🔄 Changelog
 
 ### 🆕 Version 2.x
+- **2.8**
+  - 📧 Added support for a separate **SMTP FROM address** (`SMTP_FROM_ADDRESS`) so the visible sender can differ from the SMTP login (same domain required)
+  - 🛠️ Reworked SMTP sending to be **RFC-compliant** (adds `Date`, `Message-ID`, `MIME-Version`, multipart `text/plain` + `text/html`, UTF-8 encoded subject) for better compatibility with spam filters
+  - 🖥️ **Admin Panel** extended with a new field to configure the SMTP FROM address, which is stored in the `.env` file
+  - 🗂️ Improved Docker support for **persistent configuration**: the entire `inc` directory (including `.env`, `.admin.json`, config.php, translation files) can now be mounted from the host
+  - 💾 Upload directory can now also be mounted externally via `DROPZONE_UPLOAD_DIR`, making all uploaded files **persistent and safe across container updates or reinstallation**
+  - 📦 When mounting an empty `inc` directory, Dropzone automatically **initializes it with the default files** from the image, ensuring a clean setup when the container is recreated
+  - 🔄 This means both **all settings** (SMTP, admin login, configuration options) and **all uploaded files** are preserved even if the container is removed and recreated
 - **2.7**
   - 📧 Added optional **Admin email notifications** for new uploads
   - 📝 Admin email address configuration directly in the **Admin Panel**
@@ -67,8 +75,8 @@ Version **2.7** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-7.png)
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-7_AdminPanel2.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-8.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-8_AdminPanel.png)
 
 ---
 
@@ -79,9 +87,9 @@ Try Dropzone File Sharing directly in your browser:
 
 ---
 
-## 🐳 Docker Installation (Version 2.7)
+## 🐳 Docker Installation (Version 2.8)
 
-Dropzone File Sharing **V.2.7** is available as a Docker image:
+Dropzone File Sharing **V.2.8** is available as a Docker image:
 
 ```bash
 docker pull keepcoolch/dropzonefilesharing:latest
@@ -106,22 +114,23 @@ Uploads, settings, JSON files etc. are stored inside the container.
 
 ---
 
-## 📁 Optional: Use a custom upload directory outside the container
+## 📁 Optional: Use a custom upload and the inc directory outside the container
 
 You can store all uploads outside the container (persistent on your host system). This is useful for:
-- keeping uploads when recreating/updating the container
+- keeping uploads and configuration when recreating/updating the container
 - mounting external storage
 
-1. Environment variable - Tell Dropzone where uploads should be stored inside the container:
+1 Environment variable - Tell Dropzone where uploads should be stored inside the container:
 
 ```bash
 -e DROPZONE_UPLOAD_DIR=/data/uploads
 ```
 
-2. Volume mount - Map the directory to a folder on your host (Mac, Linux, NAS):
+2 Volume mount - Map the directories to a folder on your host (Mac, Linux, NAS):
 
 ```bash
--v ~/dropzone-uploads:/data/uploads
+-v ~/dropzone/uploads:/data/uploads
+-v ~/dropzone/inc:/var/www/html/inc
 ```
 
 Full `docker run` example:
@@ -134,7 +143,8 @@ docker run -d \
   --dns 1.1.1.1 \
   --dns 8.8.8.8 \
   -e DROPZONE_UPLOAD_DIR=/data/uploads \
-  -v ~/dropzone-uploads:/data/uploads \
+  -v ~/dropzone/uploads:/data/uploads \
+  -v ~/dropzone/inc:/var/www/html/inc \
   keepcoolch/dropzonefilesharing:latest
 ```
 
@@ -151,7 +161,8 @@ services:
     environment:
       DROPZONE_UPLOAD_DIR: "/data/uploads"
     volumes:
-      - ~/dropzone-uploads:/data/uploads
+      - ~/dropzone/uploads:/data/uploads
+      - ~/dropzone/inc:/var/www/html/inc
     dns:
       - 1.1.1.1
       - 8.8.8.8
@@ -171,7 +182,7 @@ docker compose up -d
 2. Open the application in your browser
 3. Access `/admin.php` to create your admin credentials
 4. Choose your desired configuration values in the **Admin Panel**
-5. When `send_email` or `admin_notify` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password` in the **Admin Panel**
+5. When `send_email` or `admin_notify` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress` in the **Admin Panel**
 
 > ⚠️ Requires PHP 7.4 or higher. No database needed.
 
@@ -185,7 +196,7 @@ The **Admin Panel** provides a secure management interface for your **Dropzone F
 - First-time access via `/admin.php` triggers **Admin Setup** (username + password creation)
 - Credentials are stored securely (hashed) in `.admin.json` and secured with `.htaccess`
 - After setup, login via the **Admin Login** form in `/admin.php`
-- Setup your desired configuration values and when `send_email` or `admin_notify` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password`
+- Setup your desired configuration values and when `send_email` or `admin_notify` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`
 
 ---
 
@@ -210,8 +221,8 @@ You can configure the following options in the **Admin Panel**:
 - Set the timezone according to your preference
 - Control link expiration options
 - Enable/Disable `only_upload` mode without generating a link
-- Enable/Disable `send_email` mode (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password`).
-- Enable/Disable `admin_notify` mode for upload notifications (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, and `SMTP password`).
+- Enable/Disable `send_email` mode (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`).
+- Enable/Disable `admin_notify` mode for upload notifications (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`).
 - Enable/Disable `pwzip` mode for password protection of the zip file itself. If deactivated, only the download is password-protected, not the ZIP file (⚠️ ZIP password cannot be modified).
 
 ---
