@@ -80,6 +80,7 @@ Try Dropzone File Sharing directly in your browser:
 ---
 
 ## 🐳 Docker Installation (Version 2.7)
+
 Dropzone File Sharing **v2.7** is available as a Docker image:
 
 ```bash
@@ -87,6 +88,7 @@ docker pull keepcoolch/dropzonefilesharing:latest
 ```
 
 Start the container:
+
 ```bash
 docker run -d \
   --name dropzonefilesharing \
@@ -101,6 +103,67 @@ Then open:
 👉 http://localhost:8080
 
 Uploads, settings, JSON files etc. are stored inside the container.
+
+---
+
+## 📁 Optional: Use a custom upload directory outside the container
+
+You can store all uploads outside the container (persistent on your host system). This is useful for:
+- keeping uploads when recreating/updating the container
+- mounting external storage
+
+1. Environment variable
+Tell Dropzone where uploads should be stored inside the container:
+
+```bash
+-e DROPZONE_UPLOAD_DIR=/data/uploads
+```
+
+2. Volume mount
+Map the directory to a folder on your host (Mac, Linux, NAS):
+
+```bash
+-v ~/dropzone-uploads:/data/uploads
+```
+
+Full `docker run` example:
+
+```bash
+docker run -d \
+  --name dropzonefilesharing \
+  --restart unless-stopped \
+  -p 8080:80 \
+  --dns 1.1.1.1 \
+  --dns 8.8.8.8 \
+  -e DROPZONE_UPLOAD_DIR=/data/uploads \
+  -v ~/dropzone-uploads:/data/uploads \
+  keepcoolch/dropzonefilesharing:latest
+```
+
+Full `docker-compose.yml` example:
+
+```yaml
+services:
+  dropzonefilesharing:
+    image: keepcoolch/dropzonefilesharing:latest
+    container_name: dropzonefilesharing
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      DROPZONE_UPLOAD_DIR: "/data/uploads"
+    volumes:
+      - ~/dropzone-uploads:/data/uploads
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+```
+
+Run `docker compose`:
+
+```bash
+docker compose up -d
+```
 
 ---
 
