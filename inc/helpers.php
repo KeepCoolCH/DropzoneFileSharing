@@ -121,6 +121,7 @@ SMTP_HOST=mail.example.com
 SMTP_PORT=465 
 SMTP_USER=noreply@example.com
 SMTP_PASS=changeme123!
+SMTP_FROM_ADDRESS=noreply@example.com
 ENV;
         file_put_contents($envPath, $envContent);
     }
@@ -151,25 +152,64 @@ function decrypt(string $data, string $key): string|false {
 }
 
 // SMTP delivery via stream_socket_client
+// Helper function: encode Subject according to RFC 2047 if needed
+function encodeSubject(string $subject): string
+{
+    // If only ASCII (32–126), return as-is
+    if (!preg_match('/[^\x20-\x7E]/', $subject)) {
+        return $subject;
+    }
+    // UTF-8 Base64 encoded subject
+    return '=?UTF-8?B?' . base64_encode($subject) . '?=';
+}
+
+// SMTP delivery via stream_socket_client (improved version)
 function sendSMTPMail(
     string|array $to,
     string $subject,
-    string $message,
+    string $messageHtml,
     string $from,
     string $smtpHost,
-    int $smtpPort,
+    int    $smtpPort,
     string $smtpUser,
     string $smtpPass
 ): bool {
     $recipients = is_array($to) ? $to : preg_split('/[\s,;]+/', $to);
-    $recipients = array_filter(array_map('trim', $recipients), fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL));
+    $recipients = array_filter(
+        array_map('trim', $recipients),
+        fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL)
+    );
 
     if (empty($recipients)) {
-        error_log("❌ No valid recipients.");
+        error_log("No valid recipients.");
         return false;
     }
 
+    // Hostname for EHLO and Message-ID
+    $hostname = $_SERVER['HTTP_HOST']
+        ?? $_SERVER['SERVER_NAME']
+        ?? 'localhost';
+
+    // Date & Message-ID
+    $dateHeader = date(DATE_RFC2822);
+    $msgId      = sprintf('<%s@%s>', bin2hex(random_bytes(16)), $hostname);
+
+    // Encode subject if needed
+    $encodedSubject = encodeSubject($subject);
+
+    // Multipart/alternative boundary
+    $boundary = '=_DZFS_' . bin2hex(random_bytes(16));
+    $eol = "\r\n";
+
+    // Derive a plain-text version from HTML (simple but sufficient)
+    $messageText = html_entity_decode(
+        trim(strip_tags($messageHtml)),
+        ENT_QUOTES | ENT_HTML5,
+        'UTF-8'
+    );
+
     foreach ($recipients as $recipient) {
+        // SSL: usually port 465. If you use 587/STARTTLS, this needs adjustment.
         $socket = stream_socket_client("ssl://$smtpHost:$smtpPort", $errno, $errstr, 30);
         if (!$socket) {
             error_log("SMTP connect error: $errstr ($errno)");
@@ -185,15 +225,15 @@ function sendSMTPMail(
             return $response;
         };
 
-        $send = function ($cmd) use ($socket) {
-            fwrite($socket, $cmd . "\r\n");
+        $send = function (string $cmd) use ($socket, $eol) {
+            fwrite($socket, $cmd . $eol);
         };
 
+        // Greeting / handshake
         $read();
-        $send("EHLO localhost"); $read();
+        $send("EHLO " . $hostname); $read();
 
         $send("AUTH LOGIN"); $read();
-
         $send(base64_encode($smtpUser)); $read();
         $send(base64_encode($smtpPass)); $read();
 
@@ -201,9 +241,38 @@ function sendSMTPMail(
         $send("RCPT TO:<$recipient>"); $read();
         $send("DATA"); $read();
 
-        $headers = "From: $from\r\nTo: $recipient\r\nSubject: $subject\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n";
-        $send($headers . $message . "\r\n.");
-        $read(); $send("QUIT"); fclose($socket);
+        // RFC-compliant headers
+        $headers = [
+            "From: $from",
+            "To: $recipient",
+            "Subject: $encodedSubject",
+            "Date: $dateHeader",
+            "Message-ID: $msgId",
+            "MIME-Version: 1.0",
+            "Content-Type: multipart/alternative; boundary=\"$boundary\""
+        ];
+
+        // Build body: text + HTML
+        $body  = "--$boundary$eol";
+        $body .= "Content-Type: text/plain; charset=UTF-8$eol";
+        $body .= "Content-Transfer-Encoding: 8bit$eol$eol";
+        $body .= $messageText . "$eol$eol";
+
+        $body .= "--$boundary$eol";
+        $body .= "Content-Type: text/html; charset=UTF-8$eol";
+        $body .= "Content-Transfer-Encoding: 8bit$eol$eol";
+        $body .= $messageHtml . "$eol$eol";
+
+        $body .= "--$boundary--$eol";
+
+        // Send headers + body to the SMTP server
+        $data = implode($eol, $headers) . $eol . $eol . $body . $eol . '.';
+
+        $send($data);
+        $read();
+
+        $send("QUIT");
+        fclose($socket);
     }
 
     return true;
