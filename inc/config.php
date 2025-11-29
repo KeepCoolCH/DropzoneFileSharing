@@ -1,10 +1,18 @@
 <?php
 // Create folders & filedata.json
-$uploadDir = __DIR__ . '/../uploads';
-$chunksDir = $uploadDir . '/.chunks';
-$stagingRoot = $uploadDir . '/.staging';
-$dataFile = $uploadDir . '/.filedata.json';
-$incDir = __DIR__ . '/../inc';
+$baseDir = dirname(__DIR__);
+$envUploadBase = getenv('DROPZONE_UPLOAD_DIR');
+if ($envUploadBase && trim($envUploadBase) !== '') {
+    $uploadBase = rtrim($envUploadBase, '/');
+} else {
+    $uploadBase = $baseDir . '/uploads';
+}
+
+$uploadDir  = $uploadBase;
+$chunksDir  = $uploadBase . '/.chunks';
+$stagingRoot = $uploadBase . '/.staging';
+$dataFile = $uploadBase . '/.filedata.json';
+$incDir   = $baseDir . '/inc';
 $envDir = $incDir . '/.env';
 
 if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
