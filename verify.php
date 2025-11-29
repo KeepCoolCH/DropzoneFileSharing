@@ -9,7 +9,10 @@ $smtpHost = getenv('SMTP_HOST');
 $smtpPort = getenv('SMTP_PORT');
 $smtpUser = getenv('SMTP_USER');
 $smtpPass = getenv('SMTP_PASS');
-$from = $smtpUser;
+
+$smtpFromAddr = getenv('SMTP_FROM_ADDRESS') ?: $smtpUser;
+
+$from = $smtpFromAddr;
 $secretKey = 'YOUR_SECRET_KEY'; // Must be identical to upload.php
 
 $emailEncrypted = $_GET['email'] ?? '';
@@ -48,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($verificationMessage)) {
             if (empty($link) || empty($validRecipients)) {
                 $verificationMessage = "<div class='error'>❌ {$t['verification_recipient_error']}</div>";
             } else {
-				$mode = $fileData[$token]['mode'] ?? 'once';
-				$validText = $t["valid_$mode"] ?? $mode;
+                $mode = $fileData[$token]['mode'] ?? 'once';
+                $validText = $t["valid_$mode"] ?? $mode;
                 $subject = "{$t['title']} - {$t['sent_title_recipient']}";
                 $message = "<html><body>
                 {$t['sent_message_recipient1']}
@@ -57,11 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($verificationMessage)) {
                 {$t['sent_message_recipient2']}
                 {$t['title']}
                 <p><a href='$link'>$link</a></p>
-				<p>$validText</p>
+                <p>$validText</p>
                 </body></html>";
 
                 foreach ($validRecipients as $r) {
-                    $success = sendSMTPMail(trim($r), $subject, $message, $from, $smtpHost, $smtpPort, $smtpUser, $smtpPass);
+                    $success = sendSMTPMail(trim($r), $subject, $message, $from, $smtpHost, (int)$smtpPort, $smtpUser, $smtpPass);
                     if (!$success) {
                         $verificationMessage = "<div class='error'>{$t['email_error']} $r</div>";
                         break;
@@ -105,11 +108,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($verificationMessage)) {
     </form>
     <br><br>
     <?php if (!empty($verificationMessage)): ?>
-		<?= $verificationMessage ?><br><br>
-	<?php endif; ?>
-	</div>
+    <?= $verificationMessage ?><br><br>
+    <?php endif; ?>
     </div>
-	<footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
+    </div>
+    <footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
     <script src="js/main.js"></script>
 </body>
 </html>
