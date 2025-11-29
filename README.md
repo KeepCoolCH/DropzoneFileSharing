@@ -81,7 +81,7 @@ Try Dropzone File Sharing directly in your browser:
 
 ## 🐳 Docker Installation (Version 2.7)
 
-Dropzone File Sharing **v2.7** is available as a Docker image:
+Dropzone File Sharing **V.2.7** is available as a Docker image:
 
 ```bash
 docker pull keepcoolch/dropzonefilesharing:latest
@@ -112,15 +112,13 @@ You can store all uploads outside the container (persistent on your host system)
 - keeping uploads when recreating/updating the container
 - mounting external storage
 
-1. Environment variable
-Tell Dropzone where uploads should be stored inside the container:
+1. Environment variable - Tell Dropzone where uploads should be stored inside the container:
 
 ```bash
 -e DROPZONE_UPLOAD_DIR=/data/uploads
 ```
 
-2. Volume mount
-Map the directory to a folder on your host (Mac, Linux, NAS):
+2. Volume mount - Map the directory to a folder on your host (Mac, Linux, NAS):
 
 ```bash
 -v ~/dropzone-uploads:/data/uploads
