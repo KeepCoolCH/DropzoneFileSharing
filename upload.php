@@ -15,7 +15,10 @@ $smtpHost = getenv('SMTP_HOST');
 $smtpPort = getenv('SMTP_PORT');
 $smtpUser = getenv('SMTP_USER');
 $smtpPass = getenv('SMTP_PASS');
-$from = $smtpUser;
+
+$smtpFromAddr = getenv('SMTP_FROM_ADDRESS') ?: $smtpUser;
+
+$from = $smtpFromAddr;
 $secretKey = 'YOUR_SECRET_KEY'; // Set your secret key for encryption here (Must be identical to verify.php)
 
 // Resumable Chunk Upload Logic (status | append | finalize)
@@ -402,7 +405,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 <p><a href='$verifyUrl'>$verifyUrl</a></p>
                 </body></html>";
 
-            sendSMTPMail($uploader, $subject, $message, $from, $smtpHost, $smtpPort, $smtpUser, $smtpPass);
+            sendSMTPMail($uploader, $subject, $message, $from, $smtpHost, (int)$smtpPort, $smtpUser, $smtpPass);
         }
 
         if (!empty(Config::$default['admin_notify'])) {
@@ -419,7 +422,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     <p>{$t['sent_message_admin']}</p>
                 </body></html>";
 
-                sendSMTPMail($adminMail, $subjectAdmin, $messageAdmin, $from, $smtpHost, $smtpPort, $smtpUser, $smtpPass);
+                sendSMTPMail($adminMail, $subjectAdmin, $messageAdmin, $from, $smtpHost, (int)$smtpPort, $smtpUser, $smtpPass);
             }
         }
 
