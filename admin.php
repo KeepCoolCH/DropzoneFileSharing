@@ -110,6 +110,7 @@ if (isset($_POST['env_update'])) {
     $envData['SMTP_PORT'] = trim($_POST['SMTP_PORT'] ?? '');
     $envData['SMTP_USER'] = trim($_POST['SMTP_USER'] ?? '');
     $envData['SMTP_PASS'] = trim($_POST['SMTP_PASS'] ?? '');
+    $envData['SMTP_FROM_ADDRESS']  = trim($_POST['SMTP_FROM_ADDRESS'] ?? '');
     saveEnvFile(ENV_FILE, $envData);
     $env_message = $t['smtp_save'];
 }
@@ -517,6 +518,8 @@ $entries=read_json(FILEDATA_JSON,[]);
             <input type="text" name="SMTP_USER" placeholder="<?= $t['smtpuser_title'] ?>" value="<?= htmlspecialchars($envData['SMTP_USER'] ?? '') ?>">
             <label style="display:block; margin-top: 10px; margin-bottom:20px;"><?= $t['smtppass_title'] ?>:</label>
             <input type="text" name="SMTP_PASS" placeholder="<?= $t['smtppass_title'] ?>" value="<?= htmlspecialchars($envData['SMTP_PASS'] ?? '') ?>">
+            <label style="display:block; margin-top: 10px; margin-bottom:20px;"><?= $t['smtpfrom_title'] ?>:</label>
+            <input type="text" name="SMTP_FROM_ADDRESS" placeholder="<?= $t['smtpfrom_title'] ?>" value="<?= htmlspecialchars($envData['SMTP_FROM_ADDRESS'] ?? '') ?>">
             <button type="submit" style="margin-top:10px; margin-bottom: 30px;" name="env_update" value="1"><?= $t['smtp_save_button'] ?></button>
         </form>
         </div>
