@@ -7,6 +7,36 @@ if (isset($_POST['lang'])) {
     $_GET['lang'] = preg_replace('/[^a-z]/i', '', $_POST['lang']);
 }
 
+function dz_get_base_url(): string
+{
+    $isHttps =
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+
+    $scheme = $isHttps ? 'https' : 'http';
+
+    $host = $_SERVER['HTTP_X_FORWARDED_HOST']
+        ?? $_SERVER['HTTP_HOST']
+        ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+
+    $host = preg_replace('/\s.*/', '', $host);
+
+    $forwardedPrefix = $_SERVER['HTTP_X_FORWARDED_PREFIX'] ?? '';
+
+    if ($forwardedPrefix !== '') {
+        $basePath = rtrim($forwardedPrefix, '/');
+    } else {
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $basePath   = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+        if ($basePath === '/') {
+            $basePath = '';
+        }
+    }
+
+    return $scheme . '://' . $host . $basePath;
+}
+
 $userChoice = $_POST['mailChoice'] ?? 'no';
 
 loadEnv($envDir . '/.env');
@@ -369,13 +399,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             'password' => $pw !== '' ? password_hash($pw, PASSWORD_DEFAULT) : null
         ];
 
-        $basePath = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-        if ($basePath === '/' || $basePath === '\\') $basePath = '';
-        $scheme = $_SERVER['REQUEST_SCHEME'] ?? '';
-        if ($scheme !== 'http' && $scheme !== 'https') {
-            $scheme = 'http';
-        }
-        $link = $scheme . '://' . $_SERVER['HTTP_HOST'] . $basePath . "/?lang=$lang&t=$token";
+        $baseUrl = dz_get_base_url();
+        $link    = $baseUrl . "/?lang=$lang&t=$token";
         
         $fileData[$token]['link'] = $link;
 
@@ -396,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($scheme !== 'http' && $scheme !== 'https') {
                 $scheme = 'http';
             }
-            $verifyUrl = $scheme . '://' . $_SERVER['HTTP_HOST'] . "$basePath/verify.php?lang=$lang&email=$encEmail&token=$encToken";
+            $verifyUrl = $baseUrl . "/verify.php?lang=$lang&email=$encEmail&token=$encToken";
 
             $subject = "{$t['title']} - {$t['sent_title_uploader']}";
             $message = "<html><body>
