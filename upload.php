@@ -417,10 +417,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if (Config::$default['send_email'] && $mailChoice === 'yes') {
             $encEmail  = encrypt($uploader, $secretKey);
             $encToken  = encrypt($token, $secretKey);
-            $scheme = $_SERVER['REQUEST_SCHEME'] ?? '';
-            if ($scheme !== 'http' && $scheme !== 'https') {
-                $scheme = 'http';
-            }
+
             $verifyUrl = $baseUrl . "/verify.php?lang=$lang&email=$encEmail&token=$encToken";
 
             $subject = "{$t['title']} - {$t['sent_title_uploader']}";
