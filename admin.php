@@ -2,10 +2,15 @@
 
 declare(strict_types=0);
 
+$isHttps =
+  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+  || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+  || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+
 session_name('DropzoneAdminSession');
 session_start([
   'cookie_httponly' => true,
-  'cookie_secure' => isset($_SERVER['HTTPS']),
+  'cookie_secure' => $isHttps,
   'cookie_samesite' => 'Lax',
 ]);
 
@@ -68,7 +73,10 @@ if (isset($_POST['config_update'])) {
         }
     }
     saveConfigFile(CONFIG_FILE, $configData);
-    $config_message = $t['configuration_save'];
+
+    $_SESSION['config_message'] = $t['configuration_save'];
+    header('Location: admin.php?lang=' . urlencode($lang));
+    exit;
 }
 
 function loadEnvFile(string $path): array {
@@ -105,6 +113,15 @@ function saveEnvFile(string $path, array $data): void {
 
 $envData = loadEnvFile(ENV_FILE);
 
+$config_message = $_SESSION['config_message'] ?? '';
+unset($_SESSION['config_message']);
+
+$env_message = $_SESSION['env_message'] ?? '';
+unset($_SESSION['env_message']);
+
+$notice = $_SESSION['notice'] ?? '';
+unset($_SESSION['notice']);
+
 if (isset($_POST['env_update'])) {
     $envData['SMTP_HOST'] = trim($_POST['SMTP_HOST'] ?? '');
     $envData['SMTP_PORT'] = trim($_POST['SMTP_PORT'] ?? '');
@@ -112,7 +129,10 @@ if (isset($_POST['env_update'])) {
     $envData['SMTP_PASS'] = trim($_POST['SMTP_PASS'] ?? '');
     $envData['SMTP_FROM_ADDRESS']  = trim($_POST['SMTP_FROM_ADDRESS'] ?? '');
     saveEnvFile(ENV_FILE, $envData);
-    $env_message = $t['smtp_save'];
+
+    $_SESSION['env_message'] = $t['smtp_save'];
+    header('Location: admin.php?lang=' . urlencode($lang));
+    exit;
 }
 
 function read_json(string $p, $def) {
@@ -265,7 +285,6 @@ function changeLang(lang) {
 }
 
 // --- Actions ---
-$notice='';
 if($_SERVER['REQUEST_METHOD']==='POST'){
     $data=read_json(FILEDATA_JSON,[]);
     if(isset($_POST['delete_path'])){
@@ -274,7 +293,9 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
         if (($e['path'] ?? '') === $path) { $abs=safe_uploads_join($path); if($abs) @unlink($abs); }
             else $new[$key]=$e;
         }
-        write_json(FILEDATA_JSON,$new); $notice=$t['entry_delete'];
+        write_json(FILEDATA_JSON,$new); $_SESSION['notice'] = $t['entry_delete'];
+        header('Location: admin.php?lang=' . urlencode($lang));
+        exit;
     }
     elseif(isset($_POST['validity_path'],$_POST['validity_mode'])){
         $path=$_POST['validity_path']; $mode=$_POST['validity_mode'];
@@ -303,13 +324,23 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 }
             }
         }
-        write_json(FILEDATA_JSON,$data); $notice=$t['mode_change'] . "$mode.";
+        unset($e);
+        write_json(FILEDATA_JSON,$data); $_SESSION['notice'] = $t['mode_change'] . "$mode.";
+        header('Location: admin.php?lang=' . urlencode($lang));
+        exit;
     }
     elseif(isset($_POST['toggle_verified_path'])){
         $path=$_POST['toggle_verified_path'];
-        foreach($data as &$e){ if(($e['path']??'')===$path){ $e['verified']=!empty($e['verified'])?false:true; } }
-        write_json(FILEDATA_JSON,$data); $notice=$t['verification_change'];
+        foreach($data as &$e){ if(($e['path']??'')===$path){ $e['verified']=!empty($e['verified'])?false:true;
+            }
+        }
+        unset($e);
+        write_json(FILEDATA_JSON,$data); $_SESSION['notice'] = $t['verification_change'];
+        header('Location: admin.php?lang=' . urlencode($lang));
+        exit;
     }
+
+
     elseif(isset($_POST['password_path'], $_POST['new_password'])){
         $path=$_POST['password_path']; $new=$_POST['new_password'];
         foreach($data as &$e){
@@ -317,7 +348,10 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 $e['password']=trim($new)===''?null:password_hash($new,PASSWORD_DEFAULT);
             }
         }
-        write_json(FILEDATA_JSON,$data); $notice=$t['password_change'];
+        unset($e);
+        write_json(FILEDATA_JSON,$data); $_SESSION['notice'] = $t['password_change'];
+        header('Location: admin.php?lang=' . urlencode($lang));
+        exit;
     }
 }
 
@@ -346,10 +380,7 @@ $entries=read_json(FILEDATA_JSON,[]);
         <h2><?= $t['admin_panel'] ?></h2>
 
         <?php if($notice): ?>
-        <p style="color:green"><?=$notice?></p>
-        <script>
-        setTimeout(() => location.reload(), 1500);
-        </script>
+        <p style="color:green"><?= htmlspecialchars($notice) ?></p>
         <?php endif; ?>
 
         <button type="button" id="toggleTableBtn" style="margin:10px 0;">
@@ -443,11 +474,6 @@ $entries=read_json(FILEDATA_JSON,[]);
     <div id="form" style="flex: 1 1 500px;">
     <h2><?= $t['admin_configuration'] ?></h2>
     <?php if (!empty($config_message)) echo "<p style='color:green'>$config_message</p>"; ?>
-        <?php if (!empty($config_message)): ?>
-        <script>
-        setTimeout(() => location.reload(), 3000);
-        </script>
-        <?php endif; ?>
         <form method="post">
             <label style="display:block; margin-bottom:24px;"><?= $t['lang_title'] ?>:</label>
             <select name="lang_default" style="width:100%;">
@@ -504,11 +530,6 @@ $entries=read_json(FILEDATA_JSON,[]);
     <div id="form" style="flex: 1 1 500px;">
     <h2><?= $t['smtp_configuration'] ?></h2>
     <?php if (!empty($env_message)) echo "<p style='color:green'>$env_message</p>"; ?>
-        <?php if (!empty($env_message)): ?>
-        <script>
-        setTimeout(() => location.reload(), 3000);
-        </script>
-        <?php endif; ?>
         <form method="post">
             <label style="display:block; margin-bottom:20px;"><?= $t['smtphost_title'] ?>:</label>
             <input type="text" name="SMTP_HOST" placeholder="<?= $t['smtphost_title'] ?>" value="<?= htmlspecialchars($envData['SMTP_HOST'] ?? '') ?>">
