@@ -1,10 +1,15 @@
 <?php
 declare(strict_types=1);
 
+$isHttps =
+  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+  || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+  || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+
 session_name('DropzoneAdminSession');
 session_start([
   'cookie_httponly' => true,
-  'cookie_secure' => isset($_SERVER['HTTPS']),
+  'cookie_secure' => $isHttps,
   'cookie_samesite' => 'Lax',
 ]);
 
