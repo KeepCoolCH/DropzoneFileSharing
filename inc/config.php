@@ -45,6 +45,7 @@ class Config {
     'only_upload' => false,
     'send_email' => false,
     'admin_notify' => false,
+    'show_dp' => true,
     'pwzip' => false,
   ];
 }
