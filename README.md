@@ -1,13 +1,17 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **2.8** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **2.9** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
 ## 🔄 Changelog
 
 ### 🆕 Version 2.x
+- **2.9**
+  - 👁️ Added a new **“Show Download Page”** toggle (`show_dp`) in the configuration
+  - 🔗 Lets you choose whether users see a **download page** (file info and download-button) or a **direct file download** after clicking the link
+  - 🛠️ Fully integrated into the **Admin Panel** configuration and stored in the main `config.php` file
 - **2.8**
   - 📧 Added support for a separate **SMTP FROM address** (`SMTP_FROM_ADDRESS`) so the visible sender can differ from the SMTP login (same domain required)
   - 🛠️ Reworked SMTP sending to be **RFC-compliant** (adds `Date`, `Message-ID`, `MIME-Version`, multipart `text/plain` + `text/html`, UTF-8 encoded subject) for better compatibility with spam filters
@@ -75,8 +79,8 @@ Version **2.8** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-8.png)
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-8_AdminPanel.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-9.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-9_AdminPanel.png)
 
 ---
 
@@ -87,9 +91,9 @@ Try Dropzone File Sharing directly in your browser:
 
 ---
 
-## 🐳 Docker Installation (Version 2.8)
+## 🐳 Docker Installation (Version 2.9)
 
-Dropzone File Sharing **V.2.8** is available as a Docker image:
+Dropzone File Sharing **V.2.9** is available as a Docker image:
 
 ```bash
 docker pull keepcoolch/dropzonefilesharing:latest
@@ -223,6 +227,7 @@ You can configure the following options in the **Admin Panel**:
 - Enable/Disable `only_upload` mode without generating a link
 - Enable/Disable `send_email` mode (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`).
 - Enable/Disable `admin_notify` mode for upload notifications (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`).
+- Enable/Disable `show_dp` mode to control whether users see the download page. If deactivated, users are redirected to an instant direct download without viewing the download page.
 - Enable/Disable `pwzip` mode for password protection of the zip file itself. If deactivated, only the download is password-protected, not the ZIP file (⚠️ ZIP password cannot be modified).
 
 ---
