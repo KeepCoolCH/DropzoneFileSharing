@@ -62,6 +62,63 @@ function saveConfigFile(string $path, array $data): void {
 
 $configData = Config::$default;
 
+$generalDefaults = [
+    'lang_default' => 'de',
+    'timezone'     => 'Europe/Zurich',
+    'admin_email'  => 'you@example.com',
+];
+
+$boolKeyDefaults = [
+    'valid_once'    => true,
+    'valid_1h'      => true,
+    'valid_3h'      => true,
+    'valid_6h'      => true,
+    'valid_12h'     => true,
+    'valid_1d'      => true,
+    'valid_3d'      => true,
+    'valid_7d'      => true,
+    'valid_14d'     => true,
+    'valid_30d'     => true,
+    'valid_forever' => true,
+    'only_upload'   => false,
+    'send_email'    => false,
+    'admin_notify'  => false,
+    'show_dp'       => true,
+    'pwzip'         => false,
+];
+
+foreach ($generalDefaults as $key => $default) {
+    if (!array_key_exists($key, $configData)) {
+        $configData[$key] = $default;
+    }
+}
+
+foreach ($boolKeyDefaults as $key => $default) {
+    if (!array_key_exists($key, $configData)) {
+        $configData[$key] = $default;
+    }
+}
+
+$orderedKeys = array_merge(
+    array_keys($generalDefaults),
+    array_keys($boolKeyDefaults)
+);
+
+$orderedConfig = [];
+
+foreach ($orderedKeys as $key) {
+    if (array_key_exists($key, $configData)) {
+        $orderedConfig[$key] = $configData[$key];
+        unset($configData[$key]);
+    }
+}
+
+foreach ($configData as $key => $value) {
+    $orderedConfig[$key] = $value;
+}
+
+$configData = $orderedConfig;
+
 if (isset($_POST['config_update'])) {
     foreach ($configData as $key => $val) {
         if (isset($_POST[$key])) {
@@ -512,6 +569,7 @@ $entries=read_json(FILEDATA_JSON,[]);
                 'only_upload'    => $t['only_upload_mode'],
                 'send_email'     => $t['send_email_mode'],
                 'admin_notify'   => $t['admin_notify_mode'],
+                'show_dp'          => $t['showdp_mode'],
                 'pwzip'          => $t['pwzip_mode'],
                 ];
             ?>
