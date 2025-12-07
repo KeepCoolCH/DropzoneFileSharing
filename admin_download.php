@@ -25,13 +25,6 @@ if (empty($_SESSION['logged_in'])) {
     exit('Forbidden');
 }
 
-function read_json(string $path, $default) {
-    if (!file_exists($path)) return $default;
-    $s = file_get_contents($path);
-    $d = $s ? json_decode($s, true) : null;
-    return is_array($d) ? $d : $default;
-}
-
 function safe_uploads_join(string $rel): ?string {
     $rel = ltrim($rel, '/\\');
     $cand = realpath(UPLOADS_DIR . '/' . $rel);
