@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=0);
-
 $isHttps =
   (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
   || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
@@ -29,95 +27,15 @@ if (!isset($_GET['lang']) && isset($_SESSION['lang']) && $_SESSION['lang'] !== $
 $_SESSION['lang'] = $lang;
 
 define('ADMIN_JSON', $incDir . '/.admin.json');
-define('CONFIG_FILE', $incDir . '/config.php');
+define('USER_JSON',  $incDir . '/.users.json');
+if (!defined('CONFIG_FILE')) {
+    define('CONFIG_FILE', $incDir . '/config.php');
+}
 define('ENV_FILE', $incDir . '/.env/.env');
 define('UPLOADS_DIR', $uploadDir);
 define('FILEDATA_JSON', $dataFile);
 
-function saveConfigFile(string $path, array $data): void {
-    $header = '';
-    if (file_exists($path)) {
-        $lines = file($path, FILE_IGNORE_NEW_LINES);
-        foreach ($lines as $line) {
-            if (preg_match('/^\s*class\s+Config\b/', $line)) break;
-            $header .= $line . "\n";
-        }
-    } else {
-        $header = "<?php\n\n// Dropzone File Sharing configuration (auto-created)\n\n";
-    }
-
-    $export = var_export($data, true);
-    $export = preg_replace(['/^array\s*\(/', '/\)(\s*)$/'], ['[', ']$1'], $export);
-    $exportIndented = preg_replace('/^/m', '  ', $export);
-
-    $php = $header .
-        "class Config {\n" .
-        "    public static \$default = " . $exportIndented . ";\n" .
-        "}\n";
-
-    $tmp = $path . '.tmp';
-    file_put_contents($tmp, $php);
-    rename($tmp, $path);
-}
-
 $configData = Config::$default;
-
-$generalDefaults = [
-    'lang_default' => 'de',
-    'timezone'     => 'Europe/Zurich',
-    'admin_email'  => 'you@example.com',
-];
-
-$boolKeyDefaults = [
-    'valid_once'    => true,
-    'valid_1h'      => true,
-    'valid_3h'      => true,
-    'valid_6h'      => true,
-    'valid_12h'     => true,
-    'valid_1d'      => true,
-    'valid_3d'      => true,
-    'valid_7d'      => true,
-    'valid_14d'     => true,
-    'valid_30d'     => true,
-    'valid_forever' => true,
-    'only_upload'   => false,
-    'send_email'    => false,
-    'admin_notify'  => false,
-    'show_dp'       => true,
-    'pwzip'         => false,
-];
-
-foreach ($generalDefaults as $key => $default) {
-    if (!array_key_exists($key, $configData)) {
-        $configData[$key] = $default;
-    }
-}
-
-foreach ($boolKeyDefaults as $key => $default) {
-    if (!array_key_exists($key, $configData)) {
-        $configData[$key] = $default;
-    }
-}
-
-$orderedKeys = array_merge(
-    array_keys($generalDefaults),
-    array_keys($boolKeyDefaults)
-);
-
-$orderedConfig = [];
-
-foreach ($orderedKeys as $key) {
-    if (array_key_exists($key, $configData)) {
-        $orderedConfig[$key] = $configData[$key];
-        unset($configData[$key]);
-    }
-}
-
-foreach ($configData as $key => $value) {
-    $orderedConfig[$key] = $value;
-}
-
-$configData = $orderedConfig;
 
 if (isset($_POST['config_update'])) {
     foreach ($configData as $key => $val) {
@@ -179,6 +97,12 @@ unset($_SESSION['env_message']);
 $notice = $_SESSION['notice'] ?? '';
 unset($_SESSION['notice']);
 
+$user_message = $_SESSION['user_message'] ?? '';
+unset($_SESSION['user_message']);
+
+$admin_message = $_SESSION['admin_message'] ?? '';
+unset($_SESSION['admin_message']);
+
 if (isset($_POST['env_update'])) {
     $envData['SMTP_HOST'] = trim($_POST['SMTP_HOST'] ?? '');
     $envData['SMTP_PORT'] = trim($_POST['SMTP_PORT'] ?? '');
@@ -192,17 +116,129 @@ if (isset($_POST['env_update'])) {
     exit;
 }
 
-function read_json(string $p, $def) {
-    if (!file_exists($p)) return $def;
-    $s = file_get_contents($p);
-    $d = $s ? json_decode($s, true) : null;
-    return is_array($d) ? $d : $def;
+// --- User Management (.user.json) ---
+
+$users = read_json(USER_JSON, []);
+
+// Add / Update / Delete User
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Add User
+    if (isset($_POST['user_add'])) {
+        $newName = trim($_POST['user_name'] ?? '');
+        $pw1     = $_POST['user_password']  ?? '';
+        $pw2     = $_POST['user_password2'] ?? '';
+
+        if ($newName === '' || $pw1 === '') {
+            $_SESSION['user_message'] = $t['register_error'];
+        } elseif ($pw1 !== $pw2) {
+            $_SESSION['user_message'] = $t['password_error'];
+        } else {
+            foreach ($users as $u) {
+                if (hash_equals($u['username'], $newName)) {
+                    $_SESSION['user_message'] = $t['user_error_exists'];
+                    header('Location: admin.php?lang=' . urlencode($lang));
+                    exit;
+                }
+            }
+
+            $users[] = [
+                'username'      => $newName,
+                'password_hash' => password_hash($pw1, PASSWORD_DEFAULT),
+                'created_at'    => time(),
+            ];
+
+            write_json(USER_JSON, $users);
+            $_SESSION['user_message'] = $t['user_save'];
+        }
+
+        header('Location: admin.php?lang=' . urlencode($lang));
+        exit;
+    }
+
+    // Update User Password
+    if (isset($_POST['user_change_pw'])) {
+        $name = trim($_POST['user_name'] ?? '');
+        $pw1  = $_POST['user_new_password']  ?? '';
+        $pw2  = $_POST['user_new_password2'] ?? '';
+
+        if ($name === '' || $pw1 === '') {
+            $_SESSION['user_message'] = $t['register_error'];
+        } elseif ($pw1 !== $pw2) {
+            $_SESSION['user_message'] = $t['password_error'];
+        } else {
+            $changed = false;
+            foreach ($users as &$u) {
+                if (hash_equals($u['username'], $name)) {
+                    $u['password_hash'] = password_hash($pw1, PASSWORD_DEFAULT);
+                    $changed = true;
+                    break;
+                }
+            }
+            unset($u);
+
+            if ($changed) {
+                write_json(USER_JSON, $users);
+                $_SESSION['user_message'] = $t['password_change'];
+            } else {
+                $_SESSION['user_message'] = $t['user_error_notfound'];
+            }
+        }
+
+        header('Location: admin.php?lang=' . urlencode($lang));
+        exit;
+    }
+
+    // Delete User
+    if (isset($_POST['user_delete'])) {
+        $name = trim($_POST['user_name'] ?? '');
+        $new  = [];
+
+        foreach ($users as $u) {
+            if (!hash_equals($u['username'], $name)) {
+                $new[] = $u;
+            }
+        }
+
+        write_json(USER_JSON, $new);
+        $_SESSION['user_message'] = $t['entry_delete'];
+
+        header('Location: admin.php?lang=' . urlencode($lang));
+        exit;
+    }
+
+    // Change Admin account
+    if (isset($_POST['admin_update'])) {
+        $admin = read_json(ADMIN_JSON, []);
+
+        $newUsername = trim($_POST['admin_username'] ?? '');
+        $pw1         = $_POST['admin_password']  ?? '';
+        $pw2         = $_POST['admin_password2'] ?? '';
+
+        if ($newUsername === '') {
+            $_SESSION['admin_message'] = $t['register_error'];
+        } elseif ($pw1 !== '' && $pw1 !== $pw2) {
+            $_SESSION['admin_message'] = $t['password_error'];
+        } else {
+            $admin['username'] = $newUsername;
+
+            if ($pw1 !== '') {
+                $admin['password_hash'] = password_hash($pw1, PASSWORD_DEFAULT);
+                $_SESSION['admin_message'] = $t['password_change'];
+            } else {
+                $_SESSION['admin_message'] = $t['admin_save'];
+            }
+
+            $admin['created_at'] = time();
+
+            write_json(ADMIN_JSON, $admin);
+        }
+
+        header('Location: admin.php?lang=' . urlencode($lang));
+        exit;
+    }
 }
-function write_json(string $p, $d): bool {
-    $tmp = $p . '.tmp';
-    file_put_contents($tmp, json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), LOCK_EX);
-    return rename($tmp, $p);
-}
+
 function hb(int $b): string {
     $u=['B','KB','MB','GB','TB']; $i=0;
     while($b>=1024&&$i<4){$b/=1024;$i++;}
@@ -234,7 +270,7 @@ if (!$admin) {
     }
     ?>
 <!doctype html>
-<html>
+<html lang="<?= $lang ?>">
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=0.6" />
     <title><?= $t['title'] ?> - <?= $t['admin_setup'] ?></title>
@@ -435,7 +471,8 @@ $entries=read_json(FILEDATA_JSON,[]);
             <span id="flag-it" title="Italiano" onclick="changeLang('it')" style="<?= $lang === 'it' ? '' : 'opacity:0.5;' ?>">🇮🇹</span>
         </div>
         <h2><?= $t['admin_panel'] ?></h2>
-
+        
+        <!-- Upload List -->
         <?php if($notice): ?>
         <p style="color:green"><?= htmlspecialchars($notice) ?></p>
         <?php endif; ?>
@@ -459,6 +496,7 @@ $entries=read_json(FILEDATA_JSON,[]);
             $used=!empty($e['used']); $ver=!empty($e['verified']);
             $pw=!empty($e['password']);
             $up=$e['uploader_email']??''; $rec=$e['recipient_email']??[];
+            $upl_user=$e['upload_user']??'—';
             if(is_string($rec)) $rec=[$rec];
         ?>
         <div id="tableSection" class="table-responsive" style="display:none;">
@@ -469,7 +507,7 @@ $entries=read_json(FILEDATA_JSON,[]);
             </tr>
             </thead>
             <tr>
-                <td data-label="<?= $t['th_file'] ?>"><?=htmlspecialchars($name)?><br><br><?=htmlspecialchars($e['link'])?></td>
+                <td data-label="<?= $t['th_file'] ?>"><strong><?=htmlspecialchars($name)?></strong><br><br><?=htmlspecialchars($e['link'])?><br><br><?= $t['uploaded_by'] ?>: <i><?=$upl_user?></i></td>
                 <td data-label="<?= $t['th_size'] ?>"><?=$size?></td>
                 <td data-label="<?= $t['th_uploaddate'] ?>"><?=$upl?></td>
                 <td data-label="<?= $t['th_expirationdate'] ?>"><?=$end?></td>
@@ -528,8 +566,10 @@ $entries=read_json(FILEDATA_JSON,[]);
         <?php endif; ?>
     </div>
     <div style="display:flex; flex-wrap: wrap; text-align: left; gap: 20px; margin-top: 20px;">
+
+    <!-- General Configuration -->
     <div id="form" style="flex: 1 1 500px;">
-    <h2><?= $t['admin_configuration'] ?></h2>
+    <h2><?= $t['general_configuration'] ?></h2>
     <?php if (!empty($config_message)) echo "<p style='color:green'>$config_message</p>"; ?>
         <form method="post">
             <label style="display:block; margin-bottom:24px;"><?= $t['lang_title'] ?>:</label>
@@ -567,9 +607,10 @@ $entries=read_json(FILEDATA_JSON,[]);
                 'valid_30d'      => $t['valid_30d'],
                 'valid_forever'  => $t['valid_forever'],
                 'only_upload'    => $t['only_upload_mode'],
+                'user_upload'    => $t['user_upload_mode'],
                 'send_email'     => $t['send_email_mode'],
                 'admin_notify'   => $t['admin_notify_mode'],
-                'show_dp'          => $t['showdp_mode'],
+                'show_dp'        => $t['showdp_mode'],
                 'pwzip'          => $t['pwzip_mode'],
                 ];
             ?>
@@ -585,6 +626,8 @@ $entries=read_json(FILEDATA_JSON,[]);
             <button type="submit" style="margin-top:20px; margin-bottom: 30px;" name="config_update" value="1"><?= $t['configuration_save_button'] ?></button>
         </form>
     </div>
+
+    <!-- SMTP Configuration -->
     <div id="form" style="flex: 1 1 500px;">
     <h2><?= $t['smtp_configuration'] ?></h2>
     <?php if (!empty($env_message)) echo "<p style='color:green'>$env_message</p>"; ?>
@@ -601,16 +644,95 @@ $entries=read_json(FILEDATA_JSON,[]);
             <input type="text" name="SMTP_FROM_ADDRESS" placeholder="<?= $t['smtpfrom_title'] ?>" value="<?= htmlspecialchars($envData['SMTP_FROM_ADDRESS'] ?? '') ?>">
             <button type="submit" style="margin-top:10px; margin-bottom: 30px;" name="env_update" value="1"><?= $t['smtp_save_button'] ?></button>
         </form>
+
+        <!-- Admin Account Management -->
+        <h2><?= $t['admin_configuration'] ?></h2>
+        <?php if (!empty($admin_message)) echo "<p style='color:green'>$admin_message</p>"; ?>
+        <?php
+        $adminData = read_json(ADMIN_JSON, []);
+        $adminUsername = $adminData['username'] ?? '';
+        $adminCreated  = $adminData['created_at'] ?? null;
+        ?>
+        
+        <label style="display:block; margin-top: 30px; margin-bottom:20px;"><?php if ($adminCreated): ?><?= $t['user_date'] ?>: <?= date('Y-m-d H:i', $adminCreated) ?><?php endif; ?></label>
+        
+        <form method="post" style="display:flex; flex-wrap:wrap; column-gap:20px; align-items:center;">
+            <input type="text" name="admin_username" value="<?= htmlspecialchars($adminUsername) ?>" required placeholder="<?= $t['username'] ?>" style="min-width:180px;">
+            <input type="text" name="admin_password" placeholder="<?= $t['password_new'] ?>" style="flex:1; min-width:180px;">
+            <input type="text" name="admin_password2" placeholder="<?= $t['password_confirm'] ?>" style="flex:1; min-width:180px;">
+            <button type="submit" name="admin_update" value="1" style="margin-top:10px; margin-bottom: 30px;"><?= $t['admin_save_button'] ?></button>
+        </form>
         </div>
+
+    <!-- User Management -->
+    <div id="form" style="flex: 1 1 500px;">
+        <h2><?= $t['user_configuration'] ?>:</h2>
+        <?php if (!empty($user_message)) echo "<p style='color:green'>$user_message</p>"; ?>
+
+        <label style="display:block; margin-bottom:20px;"><?= $t['user_existing_title'] ?>:</label>
+        <?php
+        $users = $users ?? read_json(USER_JSON, []);
+        if (empty($users)): ?>
+            <p><?= $t['user_empty'] ?></p>
+        <?php else: ?>
+        <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th><?= $t['username'] ?></th>
+                    <th><?= $t['user_date'] ?></th>
+                    <th><?= $t['th_actions'] ?></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($users as $u): ?>
+                <tr>
+                    <td>👤 <?= htmlspecialchars($u['username'] ?? '') ?></td>
+                    <td>
+                        <?php
+                        $ct = $u['created_at'] ?? null;
+                        echo $ct ? date('Y-m-d H:i', $ct) : '—';
+                        ?>
+                    </td>
+                    <td>
+                        <!-- Change Password -->
+                        <form method="post" style="display:flex; flex-wrap:wrap; column-gap:20px; align-items:center;">
+                            <input type="hidden" name="user_name" value="<?= htmlspecialchars($u['username'] ?? '') ?>">
+                            <input type="text" name="user_new_password"  placeholder="<?= $t['password_new'] ?>" style="flex:1; min-width:180px;">
+                            <input type="text" name="user_new_password2" placeholder="<?= $t['password_confirm'] ?>" style="flex:1; min-width:180px;">
+                            <button type="submit" name="user_change_pw" value="1"><?= $t['save_button'] ?></button>
+                        </form>
+
+                        <!-- Delete -->
+                        <form method="post" onsubmit="return confirm('<?= htmlspecialchars($t['delete_confirm'], ENT_QUOTES) ?>');">
+                            <input type="hidden" name="user_name" value="<?= htmlspecialchars($u['username'] ?? '') ?>">
+                            <button type="submit" style="margin-bottom: 22px;" name="user_delete" value="1"><?= $t['delete_button'] ?></button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
         </div>
-        <div style="margin-top:20px; margin-bottom: 100px;">
+        <?php endif; ?>
+
+        <label style="display:block; margin-top: 30px; margin-bottom:20px;"><?= $t['user_add_title'] ?>:</label>
+        <form method="post" style="display:flex; flex-wrap:wrap; column-gap:20px; align-items:center;">
+            <input type="text" name="user_name" placeholder="<?= $t['username'] ?>" required style="min-width:180px;">
+            <input type="text" name="user_password" placeholder="<?= $t['password_new'] ?>" required style="flex:1; min-width:180px;">
+            <input type="text" name="user_password2" placeholder="<?= $t['password_confirm'] ?>" required style="flex:1; min-width:180px;">
+            <button type="submit" style="margin-top:10px; margin-bottom: 30px;" name="user_add" value="1"><?= $t['user_add_button'] ?></button>
+        </form>
+    </div>
+    </div>
+    <div style="margin-top:20px; margin-bottom: 100px;">
         <form method="get" style="text-align:center">
             <input type="hidden" name="logout" value="1">
             <button><?= $t['logout_button'] ?></button>
         </form>
-        </div>
     </div>
     </div>
+</div>
 <footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
 <script>
 function changeLang(lang) {
