@@ -43,6 +43,7 @@ class Config {
     'valid_30d' => true,
     'valid_forever' => true,
     'only_upload' => false,
+    'user_upload' => false,
     'send_email' => false,
     'admin_notify' => false,
     'show_dp' => true,
