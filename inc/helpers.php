@@ -1,4 +1,100 @@
 <?php
+// Write config defaults if not existing
+if (!defined('CONFIG_FILE')) {
+    define('CONFIG_FILE', $incDir . '/config.php');
+}
+
+function saveConfigFile(string $path, array $data): void {
+    $header = '';
+    if (file_exists($path)) {
+        $lines = file($path, FILE_IGNORE_NEW_LINES);
+        foreach ($lines as $line) {
+            if (preg_match('/^\s*class\s+Config\b/', $line)) break;
+            $header .= $line . "\n";
+        }
+    } else {
+        $header = "<?php\n\n// Dropzone File Sharing configuration (auto-created)\n\n";
+    }
+
+    $export = var_export($data, true);
+    $export = preg_replace(['/^array\s*\(/', '/\)(\s*)$/'], ['[', ']$1'], $export);
+    $exportIndented = preg_replace('/^/m', '  ', $export);
+
+    $php = $header .
+        "class Config {\n" .
+        "    public static \$default = " . $exportIndented . ";\n" .
+        "}\n";
+
+    $tmp = $path . '.tmp';
+    file_put_contents($tmp, $php);
+    rename($tmp, $path);
+}
+
+if (class_exists('Config')) {
+    $configData = Config::$default;
+
+    $generalDefaults = [
+        'lang_default' => 'de',
+        'timezone'     => 'Europe/Zurich',
+        'admin_email'  => 'you@example.com',
+    ];
+
+    $boolKeyDefaults = [
+        'valid_once'    => true,
+        'valid_1h'      => true,
+        'valid_3h'      => true,
+        'valid_6h'      => true,
+        'valid_12h'     => true,
+        'valid_1d'      => true,
+        'valid_3d'      => true,
+        'valid_7d'      => true,
+        'valid_14d'     => true,
+        'valid_30d'     => true,
+        'valid_forever' => true,
+        'only_upload'   => false,
+        'user_upload'   => false,
+        'send_email'    => false,
+        'admin_notify'  => false,
+        'show_dp'       => true,
+        'pwzip'         => false,
+    ];
+
+    foreach ($generalDefaults as $key => $default) {
+        if (!array_key_exists($key, $configData)) {
+            $configData[$key] = $default;
+        }
+    }
+
+    foreach ($boolKeyDefaults as $key => $default) {
+        if (!array_key_exists($key, $configData)) {
+            $configData[$key] = $default;
+        }
+    }
+
+    $orderedKeys = array_merge(
+        array_keys($generalDefaults),
+        array_keys($boolKeyDefaults)
+    );
+
+    $orderedConfig = [];
+
+    foreach ($orderedKeys as $key) {
+        if (array_key_exists($key, $configData)) {
+            $orderedConfig[$key] = $configData[$key];
+            unset($configData[$key]);
+        }
+    }
+
+    foreach ($configData as $key => $value) {
+        $orderedConfig[$key] = $value;
+    }
+
+    if ($orderedConfig !== Config::$default) {
+        Config::$default = $orderedConfig;
+        saveConfigFile(CONFIG_FILE, $orderedConfig);
+    }
+}
+
 // Clean up temp files and folder
 function rrmdir($dir) {
     foreach (scandir($dir) as $item) {
@@ -39,6 +135,20 @@ foreach (glob("$stagingRoot/*") as $stagingFolder) {
     if (is_dir($stagingFolder) && time() - filemtime($stagingFolder) > $maxAge) {
         rrmdir($stagingFolder);
     }
+}
+
+// Read and Write json
+function read_json(string $p, $def) {
+    if (!file_exists($p)) return $def;
+    $s = file_get_contents($p);
+    $d = $s ? json_decode($s, true) : null;
+    return is_array($d) ? $d : $def;
+}
+
+function write_json(string $p, $d): bool {
+    $tmp = $p . '.tmp';
+    file_put_contents($tmp, json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), LOCK_EX);
+    return rename($tmp, $p);
 }
 
 // Generate .htaccess for Upload-Folder (deny direct access)
