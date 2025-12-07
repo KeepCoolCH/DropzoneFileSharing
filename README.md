@@ -1,11 +1,27 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **2.9** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+Version **3.0** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
 
 ---
 
 ## 🔄 Changelog
+
+### 🆕 Version 3.x
+- **3.0**
+  - 👤 **New User Upload Mode (user_upload)**
+    - Introduces an optional **multi-user upload workflow**. Users can upload files but have no access to admin functions
+    - When `user_upload` mode is enabled, the Admin Panel now displays which user uploaded each file in the upload list
+    - Perfect for teams, client areas or project-based uploads
+    - Password protection, expiration times, link creation and download continue to work as usual
+  - 🧩 **Admin Panel Extensions (User Management)**
+    - Added a complete User Management module (create and delete users, reset user passwords)
+    - User accounts are stored in a dedicated JSON file inside the inc/ directory
+    - The admin account’s username and password can also be changed
+  - 🧩 **helpers.php improvements and extensions**
+    - The **default configuration** is now automatically completed and merged with any missing keys when config.php is loaded
+    - Ensures older installations or partially modified config files always remain compatible with new features
+    - Prevents missing-key errors and keeps updates seamless
 
 ### 🆕 Version 2.x
 - **2.9**
@@ -79,8 +95,8 @@ Version **2.9** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-9.png)
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV2-9_AdminPanel.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-0.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-0_AdminPanel.png)
 
 ---
 
@@ -91,9 +107,9 @@ Try Dropzone File Sharing directly in your browser:
 
 ---
 
-## 🐳 Docker Installation (Version 2.9)
+## 🐳 Docker Installation (Version 3.0)
 
-Dropzone File Sharing **V.2.9** is available as a Docker image:
+Dropzone File Sharing **V.3.0** is available as a Docker image:
 
 ```bash
 docker pull keepcoolch/dropzonefilesharing:latest
@@ -225,6 +241,7 @@ You can configure the following options in the **Admin Panel**:
 - Set the timezone according to your preference
 - Control link expiration options
 - Enable/Disable `only_upload` mode without generating a link
+- Enable/Disable `user_upload` mode so that only authenticated users are allowed to upload files, preventing anonymous uploads.
 - Enable/Disable `send_email` mode (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`).
 - Enable/Disable `admin_notify` mode for upload notifications (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`).
 - Enable/Disable `show_dp` mode to control whether users see the download page. If deactivated, users are redirected to an instant direct download without viewing the download page.
