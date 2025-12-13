@@ -300,13 +300,7 @@ if (!$admin) {
     </form>
 </div>
 <footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
-<script>
-function changeLang(lang) {
-    const url = new URL(window.location);
-    url.searchParams.set('lang', lang);
-    window.location = url.toString();
-}
-</script>
+<script src="js/lang.js"></script>
 </body>
 </html>
 <?php exit;
@@ -365,13 +359,7 @@ if(empty($_SESSION['logged_in'])){
     </form>
 </div>
 <footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
-<script>
-function changeLang(lang) {
-    const url = new URL(window.location);
-    url.searchParams.set('lang', lang);
-    window.location = url.toString();
-}
-</script>
+<script src="js/lang.js"></script>
 </body>
 </html>
 <?php exit;
@@ -734,13 +722,8 @@ $entries=read_json(FILEDATA_JSON,[]);
     </div>
 </div>
 <footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
+<script src="js/lang.js"></script>
 <script>
-function changeLang(lang) {
-    const url = new URL(window.location);
-    url.searchParams.set('lang', lang);
-    window.location = url.toString();
-}
-
 document.addEventListener("DOMContentLoaded", () => {
 
   const TEXT_SHOW_UPLOADS = "<?= addslashes($t['show_uploads_button']) ?>";
