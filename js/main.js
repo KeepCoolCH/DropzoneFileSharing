@@ -9,12 +9,6 @@ function copyLink() {
 	});
 }
 
-function changeLang(lang) {
-	const url = new URL(window.location);
-	url.searchParams.set('lang', lang);
-	window.location = url.toString();
-}
-
 const form = document.getElementById('uploadForm');
 
 const UPLOAD_ENDPOINT = 'upload.php';
