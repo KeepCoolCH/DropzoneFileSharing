@@ -113,6 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($verificationMessage)) {
     </div>
     </div>
     <footer><?= $t['title'] . ' ' . $t['version'] . ' ' . $t['footer_text'] ?></footer>
-    <script src="js/main.js"></script>
+    <script src="js/lang.js"></script>
 </body>
 </html>
