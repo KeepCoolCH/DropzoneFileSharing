@@ -73,7 +73,7 @@ if (!empty($info['password'])) {
             $errorMsg
             <br>
             <footer>{$t['title']} {$t['version']} {$t['footer_text']}</footer>
-            <script src='js/main.js'></script>
+            <script src='js/lang.js'></script>
         </body></html>";
         exit;
     }
@@ -108,7 +108,7 @@ if (!empty($info['password'])) {
                 <footer>{$t['title']} {$t['version']} {$t['footer_text']}</footer>
             </div>
         </div>
-        <script src='js/main.js'></script>
+        <script src='js/lang.js'></script>
     </body></html>";
     exit;
 }
