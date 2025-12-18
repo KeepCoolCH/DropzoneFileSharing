@@ -103,7 +103,7 @@ Version **3.0** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 ## 🌍 Online Demo
 
 Try Dropzone File Sharing directly in your browser:  
-🔗 [https://share.kevintobler.ch](https://share.kevintobler.ch)
+🔗 [https://dropzonefilesharing.com](https://dropzonefilesharing.com)
 
 ---
 
