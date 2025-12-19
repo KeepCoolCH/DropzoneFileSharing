@@ -5,6 +5,13 @@ Version **3.0** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ---
 
+## 🌍 Official Website
+
+Use Dropzone File Sharing:
+🔗 [https://dropzonefilesharing.com](https://dropzonefilesharing.com)
+
+---
+
 ## 🔄 Changelog
 
 ### 🆕 Version 3.x
@@ -97,13 +104,6 @@ Version **3.0** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://
 
 ![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-0.png)
 ![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-0_AdminPanel.png)
-
----
-
-## 🌍 Online Demo
-
-Try Dropzone File Sharing directly in your browser:  
-🔗 [https://dropzonefilesharing.com](https://dropzonefilesharing.com)
 
 ---
 
