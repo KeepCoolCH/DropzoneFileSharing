@@ -151,8 +151,9 @@ $T = [
   'uploaded_by' => "Hochgeladen vom Benutzer",
   'language' => "Sprache",
   'title' => "Dropzone File Sharing",
-  'version' => "V.3.0",
-  'footer_text' => "© 2025 von Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
+  'version' => "V.3.1",
+  'meta' => "Dropzone File Sharing ermöglicht schnelles und sicheres Teilen von Dateien mit Zugriffskontrolle, Zeitlimits, Passwortschutz und optionalem E-Mail-Versand.",
+  'footer_text' => "© 2025 von Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a> - <a href='disclaimer.php?lang={$lang}'>🛡️ Datenschutzerklärung und Haftungsausschluss</a>",
   ],
   'en' => [
   'link_not_found' => "❌ Link not found or already used.",
@@ -298,8 +299,9 @@ $T = [
   'uploaded_by' => "Uploaded by User",
   'language' => "Language",
   'title' => "Dropzone File Sharing",
-  'version' => "V.3.0",
-  'footer_text' => "© 2025 by Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
+  'version' => "V.3.1",
+  'meta' => "Dropzone File Sharing enables fast and secure file transfer with access control, expiration limits, password protection and optional email delivery.",
+  'footer_text' => "© 2025 by Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a> - <a href='disclaimer.php?lang={$lang}'>🛡️ Privacy Policy and Disclaimer</a>",
   ],
   'fr' => [
   'link_not_found' => "❌ Le lien n'a pas été trouvé ou il est déjà utilisé.",
@@ -445,8 +447,9 @@ $T = [
   'uploaded_by' => "Téléversé par l'utilisateur",
   'language' => "Langue",
   'title' => "Dropzone File Sharing",
-  'version' => "V.3.0",
-  'footer_text' => "© 2025 par Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
+  'version' => "V.3.1",
+  'meta' => "Dropzone File Sharing permet le partage rapide et sécurisé de fichiers, avec contrôle d’accès, délais d’expiration, mot de passe et envoi d’e-mails optionnel.",
+  'footer_text' => "© 2025 par Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a> - <a href='disclaimer.php?lang={$lang}'>🛡️ Politique de confidentialité et exclusion de responsabilité</a>",
   ],
   'it' => [
   'link_not_found' => "❌ Link non trovato o già utilizzato.",
@@ -592,8 +595,9 @@ $T = [
   'uploaded_by' => "Caricato dall'utente",
   'language' => "Lingua",
   'title' => "Dropzone File Sharing",
-  'version' => "V.3.0",
-  'footer_text' => "© 2025 di Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a>",
+  'version' => "V.3.1",
+  'meta' => "Dropzone File Sharing consente la condivisione rapida e sicura di file, con controllo degli accessi, scadenze, protezione tramite password e invio email opzionale.",
+  'footer_text' => "© 2025 di Kevin Tobler - <a href='https://kevintobler.ch' target='_blank'>www.kevintobler.ch</a> - <a href='disclaimer.php?lang={$lang}'>🛡️ Informativa sulla privacy e esclusione di responsabilità</a>",
   ]
 ];
 
