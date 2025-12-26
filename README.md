@@ -1,7 +1,7 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **3.0** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) – 🌐 [github.com/KeepCoolCH/DropzoneFileSharing](https://github.com/KeepCoolCH/DropzoneFileSharing) – 🌐 [hub.docker.com/keepcoolch/dropzonefilesharing](https://hub.docker.com/r/keepcoolch/dropzonefilesharing)
+Version **3.1** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) – 🌐 [github.com/KeepCoolCH/DropzoneFileSharing](https://github.com/KeepCoolCH/DropzoneFileSharing) – 🌐 [hub.docker.com/keepcoolch/dropzonefilesharing](https://hub.docker.com/r/keepcoolch/dropzonefilesharing)
 
 ---
 
@@ -13,6 +13,17 @@ Use Dropzone File Sharing:
 ---
 
 ## 🔄 Changelog
+
+### 🆕 Version 3.x
+- **3.1**
+  - 🖼️ **Favicon added**
+  - 🛡️ **Privacy Policy and Disclaimer added**
+    - Integrated a complete, multilingual **Privacy Policy and Disclaimer** (DE / EN / FR / IT)
+    - Clarifies **operator responsibility for self-hosted installations**
+    - Written in a neutral, instance-agnostic way
+  - 📝 **Legal text harmonization**
+    - Aligned wording and structure across all languages
+    - Unified terminology and headings for consistency
 
 ### 🆕 Version 3.x
 - **3.0**
@@ -102,14 +113,14 @@ Use Dropzone File Sharing:
 
 ## 📸 Screenshot
 
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-0.png)
-![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-0_AdminPanel.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-1.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-1_AdminPanel.png)
 
 ---
 
-## 🐳 Docker Installation (Version 3.0)
+## 🐳 Docker Installation (Version 3.1)
 
-Dropzone File Sharing **V.3.0** is available as a Docker image:
+Dropzone File Sharing **V.3.1** is available as a Docker image:
 
 ```bash
 docker pull keepcoolch/dropzonefilesharing:latest
