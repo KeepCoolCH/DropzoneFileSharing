@@ -1,7 +1,7 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **3.1** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) – 🌐 [github.com/KeepCoolCH/DropzoneFileSharing](https://github.com/KeepCoolCH/DropzoneFileSharing) – 🌐 [hub.docker.com/keepcoolch/dropzonefilesharing](https://hub.docker.com/r/keepcoolch/dropzonefilesharing)
+Version **3.1** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) – 🌐 [github.com/KeepCoolCH/DropzoneFileSharing](https://github.com/KeepCoolCH/DropzoneFileSharing) – 🌐 [hub.docker.com/keepcoolch/dropzonefilesharing](https://hub.docker.com/r/keepcoolch/dropzonefilesharing)
 
 ---
 
