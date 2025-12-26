@@ -46,7 +46,10 @@ if (!empty($info['password'])) {
         $fileSize = hb(filesize($filePath));
 
         $errorMsg = $pwError ? "<span>{$t['wrong_password']}</span><br><br>" : "";
-        echo "<!DOCTYPE html><html lang='$lang'><head><meta charset='UTF-8' name='viewport' content='width=device-width, initial-scale=0.6'><title>{$t['title']} - {$t['password_required']}</title>
+        echo "<!DOCTYPE html><html lang='$lang'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=0.6'>
+        <title>{$t['title']} - {$t['password_required']}</title>
+        <link rel='icon' href='img/favicon.png'>
+        <link rel='apple-touch-icon' href='img/favicon.png'>
         <link rel='stylesheet' href='css/style.css'>
         </head><body>
         <logoimg><a href='index.php?lang=$lang'><img src='img/logo.png' alt='Dropzone Logo' width='300'></a></logoimg>
@@ -86,7 +89,10 @@ if (!empty($info['password'])) {
         $fileSize = hb(filesize($filePath));
         $scriptName = basename(__FILE__);
 
-        echo "<!DOCTYPE html><html lang='$lang'><head><meta charset='UTF-8' name='viewport' content='width=device-width, initial-scale=0.6'><title>{$t['title']} - {$t['start_download']}</title>
+        echo "<!DOCTYPE html><html lang='$lang'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=0.6'>
+        <title>{$t['title']} - {$t['start_download']}</title>
+        <link rel='icon' href='img/favicon.png'>
+        <link rel='apple-touch-icon' href='img/favicon.png'>
         <link rel='stylesheet' href='css/style.css'>
         </head><body>
         <logoimg><a href='index.php?lang=$lang'><img src='img/logo.png' alt='Dropzone Logo' width='300'></a></logoimg>
