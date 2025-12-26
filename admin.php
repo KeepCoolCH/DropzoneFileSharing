@@ -272,8 +272,11 @@ if (!$admin) {
 <!doctype html>
 <html lang="<?= $lang ?>">
 <head>
-    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=0.6" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
     <title><?= $t['title'] ?> - <?= $t['admin_setup'] ?></title>
+    <link rel="icon" href="img/favicon.png">
+    <link rel="apple-touch-icon" href="img/favicon.png">
     <link rel="stylesheet" href="css/style.css">
     <script>
     const t = <?= json_encode($t, JSON_UNESCAPED_UNICODE) ?>;
@@ -332,8 +335,11 @@ if(empty($_SESSION['logged_in'])){
 <!doctype html>
 <html lang="<?= $lang ?>">
 <head>
-    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=0.6" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
     <title><?= $t['title'] ?> - <?= $t['admin_login'] ?></title>
+    <link rel="icon" href="img/favicon.png">
+    <link rel="apple-touch-icon" href="img/favicon.png">
     <link rel="stylesheet" href="css/style.css">
     <script>
     const t = <?= json_encode($t, JSON_UNESCAPED_UNICODE) ?>;
@@ -441,8 +447,11 @@ $entries=read_json(FILEDATA_JSON,[]);
 <!doctype html>
 <html lang="<?= $lang ?>">
 <head>
-    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=0.6" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
     <title><?= $t['title'] ?> - <?= $t['admin_panel'] ?></title>
+    <link rel="icon" href="img/favicon.png">
+    <link rel="apple-touch-icon" href="img/favicon.png">
     <link rel="stylesheet" href="css/style.css">
     <script>
     const t = <?= json_encode($t, JSON_UNESCAPED_UNICODE) ?>;
