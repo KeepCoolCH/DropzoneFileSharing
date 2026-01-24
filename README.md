@@ -24,8 +24,6 @@ Use Dropzone File Sharing:
   - 📝 **Legal text harmonization**
     - Aligned wording and structure across all languages
     - Unified terminology and headings for consistency
-
-### 🆕 Version 3.x
 - **3.0**
   - 👤 **New User Upload Mode (user_upload)**
     - Introduces an optional **multi-user upload workflow**. Users can upload files but have no access to admin functions
