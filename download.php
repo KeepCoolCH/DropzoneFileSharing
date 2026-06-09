@@ -143,3 +143,65 @@ header('Pragma: public');
 flush();
 readfile($filePath);
 exit;
+
+// show Download Page
+    if (!empty(Config::$default['show_dp']) && (($_GET['dl'] ?? '') !== '1') && !$pwValid) {
+
+        $fileName = basename($info['name'] ?? $filePath);
+        $fileSize = hb(filesize($filePath));
+        $scriptName = basename(__FILE__);
+
+        echo "<!DOCTYPE html><html lang='$lang'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=0.6'>
+        <title>{$t['title']} - {$t['start_download']}</title>
+        <link rel='icon' href='img/favicon.png'>
+        <link rel='apple-touch-icon' href='img/favicon.png'>
+        <link rel='stylesheet' href='css/style.css'>
+        </head><body>
+        <logoimg><a href='index.php?lang=$lang'><img src='img/logo.png' alt='Dropzone Logo' width='300'></a></logoimg>
+        <div id='main'>
+        <div id='form'>
+                <div id='languageFlags' style='font-size: 2em; cursor: pointer; user-select: none;'>
+                    <span id='flag-de' title='German' onclick='changeLang(\"de\")' style='margin-right: 10px; " . ($lang === 'de' ? '' : 'opacity:0.5;') . "'>🇩🇪</span>
+                    <span id='flag-en' title='English' onclick='changeLang(\"en\")' style='margin-right: 10px; " . ($lang === 'en' ? '' : 'opacity:0.5;') . "'>🇬🇧</span>
+                    <span id='flag-fr' title='Français' onclick='changeLang(\"fr\")' style='margin-right: 10px; " . ($lang === 'fr' ? '' : 'opacity:0.5;') . "'>🇫🇷</span>
+                    <span id='flag-it' title='Italiano' onclick='changeLang(\"it\")' style='" . ($lang === 'it' ? '' : 'opacity:0.5;') . "'>🇮🇹</span>
+                </div>
+                <h2>{$t['start_download']}</h2>
+                <strong>{$t['file']}:</strong> {$fileName}
+                <br><br>
+                <strong>{$t['th_size']}:</strong> {$fileSize}
+                <br><br><br>
+                <button onclick=\"window.location.href='" . htmlspecialchars($scriptName, ENT_QUOTES, 'UTF-8') . "?lang=$lang&t=" . urlencode($token) . "&dl=1'\" style='margin-top: 10px;'>{$t['start_download']}</button>
+                <br><br><br><br>
+                <footer>{$t['title']} {$t['version']} {$t['footer_text']}</footer>
+            </div>
+        </div>
+        <script src='js/lang.js'></script>
+    </body></html>";
+    exit;
+}
+
+// mark Download
+if (($fileData[$token]['type'] ?? '') === 'once') {
+    $fileData[$token]['used'] = true;
+}
+
+// tracking Download
+if (!isset($fileData[$token]['downloads'])) {
+    $fileData[$token]['downloads'] = 0;
+}
+
+$fileData[$token]['downloads'] += 1;
+$fileData[$token]['last_download'] = time();
+file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
+
+
+header('Content-Description: File Transfer');
+header('Content-Type: application/octet-stream');
+header('Content-Disposition: attachment; filename="' . basename($info['name']) . '"');
+header('Content-Length: ' . filesize($filePath));
+header('Cache-Control: no-cache');
+header('Pragma: public');
+flush();
+readfile($filePath);
+exit;
