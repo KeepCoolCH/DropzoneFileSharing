@@ -1,7 +1,7 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **3.1** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) – 🌐 [github.com/KeepCoolCH/DropzoneFileSharing](https://github.com/KeepCoolCH/DropzoneFileSharing) – 🌐 [hub.docker.com/r/keepcoolch/dropzonefilesharing](https://hub.docker.com/r/keepcoolch/dropzonefilesharing)
+Version **3.2** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) – 🌐 [github.com/KeepCoolCH/DropzoneFileSharing](https://github.com/KeepCoolCH/DropzoneFileSharing) – 🌐 [hub.docker.com/r/keepcoolch/dropzonefilesharing](https://hub.docker.com/r/keepcoolch/dropzonefilesharing)
 
 ---
 
@@ -15,6 +15,30 @@ Use Dropzone File Sharing:
 ## 🔄 Changelog
 
 ### 🆕 Version 3.x
+- **3.2**
+  - 📤 **More reliable resumable chunk uploads**
+    - Added server-side offset validation and per-file locking to prevent duplicate chunks during retries
+    - Incomplete uploads are rejected before finalization instead of being moved or archived
+    - Improved cleanup of `.part`, `.meta`, `.lock` and temporary `.current` files after successful, cancelled or expired uploads
+  - 📦 **Safer ZIP creation and finalization**
+    - Upload completion is only reported after the ZIP process has finished successfully
+    - Added final checks to ensure the ZIP archive exists, is readable and is not empty before creating the download link
+    - ZIP and filesystem errors now return proper HTTP error responses and clean up temporary data
+    - Added free-space checks for both uploaded files and the final ZIP archive
+  - 🔒 **Upload security improvements**
+    - Added strict validation for upload IDs, relative paths, file sizes, file counts and upload modes
+    - Prevented directory traversal and invalid control characters in uploaded paths
+    - Added safer host and URL handling when generating download and verification links
+    - Escaped uploaded filenames in the browser to prevent HTML injection
+  - 💾 **Safer metadata storage**
+    - Added locked, atomic JSON updates to prevent concurrent upload requests from overwriting metadata
+    - Fixed an undefined cleanup-key issue when storing uploader and recipient addresses
+    - Improved metadata validation and error handling for save and cleanup requests
+  - 🖥️ **Improved browser upload handling**
+    - HTTP and server errors are no longer hidden or displayed as successful uploads
+    - Upload controls are restored after an error so the upload can be retried without reloading the page
+    - Large drag-and-drop folders are now read completely, including directories containing more than 100 entries
+    - Folder paths and file metadata are preserved more reliably during drag-and-drop uploads
 - **3.1**
   - 🖼️ **Favicon added**
   - 🛡️ **Privacy Policy and Disclaimer added**
@@ -65,6 +89,224 @@ Use Dropzone File Sharing:
   - 📱 Fully responsive redesign of the **Admin Panel** for mobile devices
   - 🔍 Integrated search function for uploads
 - **2.4**
+  - ⚙️ Added **Admin Panel** with password-protected setup
+  - 📎 Manage Uploads (change expiration time, change password)
+  - 📥 Download Uploads directly from the **Admin Panel**
+  - 🧹 Delete Uploads directly from the **Admin Panel**
+- **2.3**
+  - 🔒 Security improvements  
+  - 🗑️ When the user manually cancels the upload, reloads the page, or closes the browser, temporary files are cleaned up and the entry is removed from the JSON file
+- **2.2**
+  - 🔒 Security improvements  
+  - 💾 Check for sufficient disk space before upload (error message if too little free space)  
+- **2.1**
+  - 📧 The time period for which the file is valid is included in the email to the recipient
+- **2.0**
+  - 📘 Completely reworked chunk upload  
+  - ⚠️ No more errors when uploading very large files  
+  - 🐞 Other bug fixes  
+
+### ✨ Version 1.x
+- **1.9**
+  - 📘 New logo, colors and file list  
+  - 📱 Responsive design for phones  
+- **1.8**
+  - 📧 Option to send files via email or just copy the download link  
+- **1.7**
+  - 📧 Share a unique download link directly to the recipient’s email inbox (multiple recipients supported)  
+  
+---
+
+## 🚀 Features
+
+- 📂 Drag & drop upload for files or entire folders  
+- 🔐 Optional password protection for each upload  
+- ⏳ Set link expiration (1h, 3h, 6h, 12h, 1–30 days or keep forever)  
+- 🔁 One-time or reusable download links  
+- 📎 Automatically creates a ZIP archive for folder uploads  
+- 🗣️ Multilingual (German, English, French & Italian)  
+- ✨ No database required – pure PHP
+- 🚫 No filesize limit using chunks
+- ✅ Upload with Progress Bar
+- ⚙️ Integrated Admin Panel with configuration and email settings
+- 🔍 Search uploads with filename, filesize, date or email
+
+---
+
+## 📸 Screenshot
+
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-2.png)
+![Screenshot](https://online.kevintobler.ch/projectimages/DropzoneFileSharingV3-2_AdminPanel.png)
+
+---
+
+## 🐳 Docker Installation (Version 3.2)
+
+Dropzone File Sharing **V.3.2** is available as a Docker image:
+
+```bash
+docker pull keepcoolch/dropzonefilesharing:latest
+```
+
+Start the container:
+
+```bash
+docker run -d \
+  --name dropzonefilesharing \
+  --restart=unless-stopped \
+  -p 8080:80 \
+  --dns 1.1.1.1 \
+  --dns 8.8.8.8 \
+  keepcoolch/dropzonefilesharing:latest
+```
+
+Then open:
+👉 http://localhost:8080
+
+Uploads, settings, JSON files etc. are stored inside the container.
+
+---
+
+## 📁 Optional: Use a custom upload and the inc directory outside the container
+
+You can store all uploads outside the container (persistent on your host system). This is useful for:
+- keeping uploads and configuration when recreating/updating the container
+- mounting external storage
+
+1 Environment variable - Tell Dropzone where uploads should be stored inside the container:
+
+```bash
+-e DROPZONE_UPLOAD_DIR=/data/uploads
+```
+
+2 Volume mount - Map the directories to a folder on your host (Mac, Linux, NAS):
+
+```bash
+-v ~/dropzone/uploads:/data/uploads
+-v ~/dropzone/inc:/var/www/html/inc
+```
+
+Full `docker run` example:
+
+```bash
+docker run -d \
+  --name dropzonefilesharing \
+  --restart unless-stopped \
+  -p 8080:80 \
+  --dns 1.1.1.1 \
+  --dns 8.8.8.8 \
+  -e DROPZONE_UPLOAD_DIR=/data/uploads \
+  -v ~/dropzone/uploads:/data/uploads \
+  -v ~/dropzone/inc:/var/www/html/inc \
+  keepcoolch/dropzonefilesharing:latest
+```
+
+Full `docker-compose.yml` example:
+
+```yaml
+services:
+  dropzonefilesharing:
+    image: keepcoolch/dropzonefilesharing:latest
+    container_name: dropzonefilesharing
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      DROPZONE_UPLOAD_DIR: "/data/uploads"
+    volumes:
+      - ~/dropzone/uploads:/data/uploads
+      - ~/dropzone/inc:/var/www/html/inc
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+```
+
+Run `docker compose`:
+
+```bash
+docker compose up -d
+```
+
+---
+
+## 🔧 Manual Installation (non-Docker)
+
+1. Upload all files to your web server
+2. Open the application in your browser
+3. Access `/admin.php` to create your admin credentials
+4. Choose your desired configuration values in the **Admin Panel**
+5. When `send_email` or `admin_notify` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress` in the **Admin Panel**
+
+> ⚠️ Requires PHP 7.4 or higher. No database needed.
+
+---
+
+## 🧭 Admin Panel
+
+The **Admin Panel** provides a secure management interface for your **Dropzone File Sharing** installation.
+
+### 🔐 Login & Setup Admin Panel
+- First-time access via `/admin.php` triggers **Admin Setup** (username + password creation)
+- Credentials are stored securely (hashed) in `.admin.json` and secured with `.htaccess`
+- After setup, login via the **Admin Login** form in `/admin.php`
+- Setup your desired configuration values and when `send_email` or `admin_notify` is set to active, make shure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`
+
+---
+
+## 🌍 Language Support
+
+Default language is German `?lang=de`. Use `?lang=en` to switch to English, `?lang=fr` to switch to French, `?lang=it` to switch to Italian or click on the flag:
+
+```
+https://example.com/index.php?lang=de
+https://example.com/index.php?lang=en
+https://example.com/index.php?lang=fr
+https://example.com/index.php?lang=it
+```
+
+---
+
+## ⚙️ Configuration
+
+You can configure the following options in the **Admin Panel**:
+
+- Choose default language (e.g. 'de', 'en', 'fr' or 'it')
+- Set the timezone according to your preference
+- Control link expiration options
+- Enable/Disable `only_upload` mode without generating a link
+- Enable/Disable `user_upload` mode so that only authenticated users are allowed to upload files, preventing anonymous uploads.
+- Enable/Disable `send_email` mode (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`).
+- Enable/Disable `admin_notify` mode for upload notifications (⚠️ make sure to define the `SMTP server`, `SMTP port`, `SMTP username`, `SMTP password` and `SMTP From Adress`).
+- Enable/Disable `show_dp` mode to control whether users see the download page. If deactivated, users are redirected to an instant direct download without viewing the download page.
+- Enable/Disable `pwzip` mode for password protection of the zip file itself. If deactivated, only the download is password-protected, not the ZIP file (⚠️ ZIP password cannot be modified).
+
+---
+
+## 🔒 Security
+
+- Each upload can be protected with a custom password  
+- Option to allow only a **single download** or multiple downloads  
+- Files are automatically deleted after the expiration time
+- Passwords are **never stored in plain text**
+
+---
+
+## 📁 Folder Uploads & ZIP
+
+When uploading a folder, the tool detects it and automatically creates a ZIP file from its contents to simplify sharing.
+
+---
+
+## 🧑‍💻 Developer
+
+**Kevin Tobler**  
+🌐 [www.kevintobler.ch](https://www.kevintobler.ch)
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** – feel free to use, modify, and distribute.
   - ⚙️ Added **Admin Panel** with password-protected setup
   - 📎 Manage Uploads (change expiration time, change password)
   - 📥 Download Uploads directly from the **Admin Panel**
