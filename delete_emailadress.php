@@ -1,5 +1,6 @@
 <?php
 require_once 'inc/config.php';
+require_once 'inc/helpers.php';
 
 header('Content-Type: text/plain; charset=utf-8');
 
@@ -14,43 +15,43 @@ if (!isset($input['token']) || $input['token'] !== $secretToken) {
 }
 
 $uploadId = trim($input['uploadId'] ?? '');
-if ($uploadId === '') {
+if (!preg_match('/^[a-f0-9]{16}$/', $uploadId)) {
     http_response_code(400);
-    exit('No uploadId');
+    exit('Invalid uploadId');
 }
 
-$fileData = file_exists($dataFile) ? json_decode(file_get_contents($dataFile), true) : [];
+$fileData = read_json($dataFile, []);
 
 if (!empty($input['cleanup']) && !empty($fileData[$uploadId]['keys'])) {
     foreach ($fileData[$uploadId]['keys'] as $key) {
         @unlink($chunksDir . '/' . $key . '.part');
         @unlink($chunksDir . '/' . $key . '.meta');
+        @unlink($chunksDir . '/' . $key . '.lock');
+        foreach (glob($chunksDir . '/' . $key . '-*.current') ?: [] as $currentPath) {
+            @unlink($currentPath);
+        }
     }
 }
 
 if (isset($fileData[$uploadId])) {
-    unset($fileData[$uploadId]);
-    file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
+    $saved = update_json_file($dataFile, function (array $current) use ($uploadId): array {
+        unset($current[$uploadId]);
+        return $current;
+    });
+    if (!$saved) {
+        http_response_code(500);
+        exit('Could not update upload metadata');
+    }
     echo "Deleted entry\n";
 } else {
     echo "Not found in DB\n";
 }
 
 if (!empty($input['cleanup'])) {
-    function rrmdir($dir) {
-        if (!is_dir($dir)) return;
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-        foreach ($files as $file) {
-            $file->isDir() ? rmdir($file->getRealPath()) : @unlink($file->getRealPath());
-        }
-        @rmdir($dir);
-    }
-
     $stagingDir = rtrim($stagingRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . basename($uploadId);
-    @rrmdir($stagingDir);
+    if (is_dir($stagingDir)) {
+        rrmdir($stagingDir);
+    }
 
     echo "Cleanup done\n";
 }
