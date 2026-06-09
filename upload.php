@@ -26,6 +26,9 @@ function dz_get_base_url(): string
         ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
 
     $host = preg_replace('/\s.*/', '', $host);
+    if (!preg_match('/^[A-Za-z0-9.-]+(?::[0-9]{1,5})?$/', $host)) {
+        $host = 'localhost';
+    }
 
     $forwardedPrefix = $_SERVER['HTTP_X_FORWARDED_PREFIX'] ?? '';
 
@@ -69,15 +72,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $mode        = $_POST['mode']     ?? 'once';
     $mailChoice  = $_POST['mailChoice'] ?? 'no';
 
-    // Normalize path (keep structure, prevent traversal)
-    $relativePath = str_replace('\\', '/', $rawName);
-    $relativePath = preg_replace('#^(\.\.[/\\\\])+?#', '', $relativePath);
-    $relativePath = preg_replace('#^/+?#', '', $relativePath);
-
-    if ($relativePath === '') {
+    if (!preg_match('/^[a-f0-9]{16}$/', $uploadId)) {
+        http_response_code(400);
         header('Content-Type: text/plain; charset=UTF-8');
-        echo "OK 0";
-        exit;
+        exit('ERR invalid uploadId');
+    }
+    if ($totalFiles < 1 || $totalFiles > 10000) {
+        http_response_code(400);
+        header('Content-Type: text/plain; charset=UTF-8');
+        exit('ERR invalid file count');
+    }
+    if (!preg_match('/^\d+$/', (string)$totalSizeIn)) {
+        http_response_code(400);
+        header('Content-Type: text/plain; charset=UTF-8');
+        exit('ERR invalid file size');
+    }
+    if (!in_array($mode, ['once','1h','3h','6h','12h','1d','3d','7d','14d','30d','forever'], true)) {
+        http_response_code(400);
+        header('Content-Type: text/plain; charset=UTF-8');
+        exit('ERR invalid upload mode');
+    }
+
+    // Normalize path, preserve directory structure and reject traversal/control bytes.
+    $relativePath = str_replace('\\', '/', $rawName);
+    $relativePath = ltrim($relativePath, '/');
+    $pathParts = explode('/', $relativePath);
+    $validPath = $relativePath !== ''
+        && strlen($relativePath) <= 4096
+        && preg_match('//u', $relativePath)
+        && !preg_match('/[\x00-\x1F\x7F]/', $relativePath);
+    foreach ($pathParts as $part) {
+        if ($part === '' || $part === '.' || $part === '..') {
+            $validPath = false;
+            break;
+        }
+    }
+
+    if (!$validPath) {
+        http_response_code(400);
+        header('Content-Type: text/plain; charset=UTF-8');
+        exit('ERR invalid relative path');
     }
 
     // Big-Int-Helpers
@@ -112,6 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $key      = md5($uploadId . '|' . $relativePath);
     $partPath = rtrim($chunksDir, '/')."/$key.part";
     $metaPath = rtrim($chunksDir, '/')."/$key.meta";
+    $lockPath = rtrim($chunksDir, '/')."/$key.lock";
 
     $stagingRoot = rtrim($uploadDir, '/').'/.staging';
     $stagingDir  = $stagingRoot . '/' . ($uploadId !== '' ? $uploadId : 'default');
@@ -128,8 +163,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $v = ltrim($v, '0');
         return $v === '' ? '0' : $v;
     };
-    $meta_write = function(string $path, string $n) {
-        file_put_contents($path, preg_replace('/\D+/', '', $n) ?? '0', LOCK_EX);
+    $meta_write = function(string $path, string $n): bool {
+        return file_put_contents($path, preg_replace('/\D+/', '', $n) ?? '0', LOCK_EX) !== false;
     };
 
     // ---- STATUS ----
@@ -144,22 +179,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($action === 'append') {
         header('Content-Type: text/plain; charset=UTF-8');
         
-        // --- Save key into fileData for cleanup ---
-        $fileData = file_exists($dataFile) ? json_decode(file_get_contents($dataFile), true) : [];
-        if (!isset($fileData[$uploadId])) {
-            $fileData[$uploadId] = [
-                'uploader_email'  => '',
-                'recipient_email' => [],
-                'keys'            => []
+        $metadataSaved = update_json_file($dataFile, function (array $fileData) use ($uploadId, $key): array {
+            if (!isset($fileData[$uploadId]) || !is_array($fileData[$uploadId])) {
+                $fileData[$uploadId] = [
+                    'uploader_email'  => '',
+                    'recipient_email' => [],
+                    'keys'            => []
                 ];
             }
             if (!isset($fileData[$uploadId]['keys']) || !is_array($fileData[$uploadId]['keys'])) {
                 $fileData[$uploadId]['keys'] = [];
             }
-            if (!in_array($key, $fileData[$uploadId]['keys'])) {
+            if (!in_array($key, $fileData[$uploadId]['keys'], true)) {
                 $fileData[$uploadId]['keys'][] = $key;
-                file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
             }
+            return $fileData;
+        });
+        if (!$metadataSaved) {
+            http_response_code(500);
+            exit('ERR cannot save upload metadata');
+        }
 
         if (!isset($_FILES['chunk'])) { echo "ERR no chunk field"; exit; }
         if ((int)$_FILES['chunk']['error'] !== UPLOAD_ERR_OK) {
@@ -168,6 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         $tmpUpload    = $_FILES['chunk']['tmp_name'];
         $chunkSizeInt = isset($_FILES['chunk']['size']) ? (int)$_FILES['chunk']['size'] : 0;
+        $expectedOffset = $bi_norm((string)($_POST['offset'] ?? '0'));
 
         // Check diskspace
         $free = disk_free_space($chunksDir);
@@ -176,8 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
 
         // Copy into own tmp
-        $chunkCopy = rtrim($chunksDir, '/')."/$key.current";
-        @unlink($chunkCopy);
+        $chunkCopy = rtrim($chunksDir, '/') . '/' . $key . '-' . bin2hex(random_bytes(6)) . '.current';
         if (!move_uploaded_file($tmpUpload, $chunkCopy)) {
             if (!copy($tmpUpload, $chunkCopy)) { echo "ERR cannot move/copy upload to tmp"; exit; }
         }
@@ -188,15 +227,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($chunkSizeInt === 0) { @unlink($chunkCopy); echo "ERR empty chunk"; exit; }
         }
 
+        $lock = fopen($lockPath, 'c');
+        if ($lock === false || !flock($lock, LOCK_EX)) {
+            @unlink($chunkCopy);
+            if (is_resource($lock)) fclose($lock);
+            http_response_code(500);
+            exit('ERR cannot lock upload');
+        }
+
+        $received = $meta_read($metaPath);
+        if ($bi_cmp($received, $expectedOffset) !== 0) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+            @unlink($chunkCopy);
+            echo "OK $received";
+            exit;
+        }
+
         // Append to .part
         $out = fopen($partPath, file_exists($partPath) ? 'ab' : 'wb');
-        if ($out === false) { @unlink($chunkCopy); echo "ERR cannot open part for write"; exit; }
+        if ($out === false) {
+            flock($lock, LOCK_UN); fclose($lock); @unlink($chunkCopy);
+            http_response_code(500); exit('ERR cannot open part for write');
+        }
         $in = fopen($chunkCopy, 'rb');
-        if ($in === false) { fclose($out); @unlink($chunkCopy); echo "ERR cannot open chunkCopy"; exit; }
+        if ($in === false) {
+            fclose($out); flock($lock, LOCK_UN); fclose($lock); @unlink($chunkCopy);
+            http_response_code(500); exit('ERR cannot open chunkCopy');
+        }
 
         if (stream_copy_to_stream($in, $out) === false) {
             fclose($in); fclose($out); @unlink($chunkCopy);
-            echo "ERR write failed"; exit;
+            flock($lock, LOCK_UN); fclose($lock);
+            http_response_code(500); exit('ERR write failed');
         }
         fflush($out);
         fclose($in);
@@ -204,9 +267,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         @unlink($chunkCopy);
 
         // Progress
-        $received = $meta_read($metaPath);
         $received = $bi_add($received, (string)$chunkSizeInt);
-        $meta_write($metaPath, $received);
+        if (!$meta_write($metaPath, $received)) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+            http_response_code(500);
+            exit('ERR cannot update upload progress');
+        }
+        flock($lock, LOCK_UN);
+        fclose($lock);
 
         echo "OK $received";
         exit;
@@ -230,12 +299,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         $received  = $meta_read($metaPath);
         $totalSize = $bi_norm((string)$totalSizeIn);
-        $canFinalize = ($totalSize !== '0' && $bi_cmp($received, $totalSize) >= 0);
+        $canFinalize = $bi_cmp($received, $totalSize) === 0;
 
-        if (!$canFinalize && !file_exists($partPath)) {
+        if (!$canFinalize) {
+            http_response_code(409);
             header('Content-Type: text/plain; charset=UTF-8');
-            echo "STATUS $received";
-            exit;
+            exit("ERR incomplete upload: received $received of $totalSize bytes");
         }
 
         // Move to .staging
@@ -243,22 +312,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $destDir = dirname($destFullPath);
         if (!is_dir($destDir)) mkdir($destDir, 0777, true);
 
-        if (file_exists($destFullPath)) @unlink($destFullPath);
-        if (!rename($partPath, $destFullPath)) {
+        if (file_exists($destFullPath) && !unlink($destFullPath)) {
+            http_response_code(500);
+            exit('ERR cannot replace staged file');
+        }
+        if ($totalSize === '0') {
+            if (file_put_contents($destFullPath, '') === false) {
+                http_response_code(500);
+                exit('ERR cannot create empty file');
+            }
+        } elseif (!rename($partPath, $destFullPath)) {
             if (!copy($partPath, $destFullPath)) {
+                http_response_code(500);
                 header('Content-Type: text/plain; charset=UTF-8');
                 echo "ERR finalize move failed"; exit;
             }
             @unlink($partPath);
         }
         @unlink($metaPath);
+        @unlink($lockPath);
 
         // Mark file as complete
         $manifest = $stagingDir . '/.complete.json';
         $complete = file_exists($manifest) ? json_decode(file_get_contents($manifest), true) : [];
         if (!is_array($complete)) $complete = [];
         $complete[$relativePath] = true;
-        file_put_contents($manifest, json_encode($complete));
+        if (file_put_contents($manifest, json_encode($complete, JSON_UNESCAPED_SLASHES), LOCK_EX) === false) {
+            http_response_code(500);
+            exit('ERR cannot update completion manifest');
+        }
 
         // All complete
         $completedCount = count($complete);
@@ -272,7 +354,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         $token   = bin2hex(random_bytes(8));
         $tempDir = $uploadDir . '/' . $token;
-        mkdir($tempDir, 0777, true);
+        if (!mkdir($tempDir, 0777, true) && !is_dir($tempDir)) {
+            http_response_code(500);
+            exit('ERR cannot create temporary directory');
+        }
+        $failFinalize = function (int $status, string $message) use ($tempDir, $uploadDir, $token): void {
+            if (is_dir($tempDir)) rrmdir($tempDir);
+            @unlink($uploadDir . '/' . $token . '.zip');
+            http_response_code($status);
+            header('Content-Type: text/plain; charset=UTF-8');
+            exit('ERR ' . $message);
+        };
 
         // Move staging → tempDir (without .complete.json)
         $it = new RecursiveIteratorIterator(
@@ -292,30 +384,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 } else {
                         $dstDir = dirname($dst);
                         if (!is_dir($dstDir)) mkdir($dstDir, 0777, true);
-                                rename($path, $dst);
+                        if (!rename($path, $dst)) {
+                            $failFinalize(500, 'cannot move staged file');
                         }
                 }
+        }
 
         @unlink($tempDir . '/.complete.json');
 
         $zipName = "$token.zip";
         $zipPath = "$uploadDir/$zipName";
+        $zipInputSize = 0;
+        $sizeIterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($tempDir, FilesystemIterator::SKIP_DOTS)
+        );
+        foreach ($sizeIterator as $item) {
+            if ($item->isFile()) {
+                $zipInputSize += $item->getSize();
+            }
+        }
+        $freeSpace = disk_free_space($uploadDir);
+        if ($freeSpace !== false && $freeSpace < ($zipInputSize + 10 * 1024 * 1024)) {
+            $failFinalize(507, 'insufficient disk space for zip');
+        }
         if (Config::$default['pwzip']):
         $pwzip = "$pw";
         else:
         $pwzip = "";
         endif;
 
-        header('X-Accel-Buffering: no');
-        ini_set('output_buffering', 'off');
-        ini_set('zlib.output_compression', '0');
-        if (function_exists('apache_setenv')) {
-                apache_setenv('no-gzip', '1');
-        }
-        while (ob_get_level() > 0) { ob_end_flush(); }
-        ob_implicit_flush(true);
-
-        $cmd = "cd " . escapeshellarg($tempDir) . " && zip -v -r -0 -ll " .
+        $cmd = "cd " . escapeshellarg($tempDir) . " && zip -q -r -0 " .
                ($pwzip !== '' ? "-P " . escapeshellarg($pwzip) . " " : "") .
                escapeshellarg($zipPath) . " . 2>&1";
 
@@ -325,39 +423,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             2 => ['pipe', 'w'],  // stderr
         ];
 
+        if (!function_exists('proc_open')) {
+            $failFinalize(500, 'zip process support is unavailable');
+        }
         $proc = proc_open($cmd, $descriptorspec, $pipes);
         if (!is_resource($proc)) {
-            echo "<!-- ERR cannot start zip -->\n"; flush();
-            exit;
+            $failFinalize(500, 'cannot start zip');
         }
         fclose($pipes[0]);
 
         stream_set_blocking($pipes[1], false);
         stream_set_blocking($pipes[2], false);
 
-        $lastPing = time();
-        echo "<!-- ZIP start: " . date('H:i:s') . " -->\n"; flush();
-
+        $processExitCode = null;
         while (true) {
             $out = fread($pipes[1], 8192);
             $err = fread($pipes[2], 8192);
 
             if ($out !== false && $out !== '') {
-                echo "<!-- zip: " . htmlspecialchars(rtrim($out)) . " -->\n";
+                error_log('zip: ' . rtrim($out));
             }
             if ($err !== false && $err !== '') {
-                echo "<!-- zip ERR: " . htmlspecialchars(rtrim($err)) . " -->\n";
+                error_log('zip error: ' . rtrim($err));
             }
-
-            if (time() - $lastPing >= 10) {
-                echo "<!-- PING " . time() . " -->\n";
-                $lastPing = time();
-            }
-
-            flush();
 
             $status = proc_get_status($proc);
             if (!$status['running']) {
+                $processExitCode = $status['exitcode'];
                 break;
             }
             usleep(150000); // 150 ms
@@ -365,17 +457,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         fclose($pipes[1]);
         fclose($pipes[2]);
-        $exitCode = proc_close($proc);
+        $closeExitCode = proc_close($proc);
+        $exitCode = $processExitCode !== null && $processExitCode >= 0
+            ? $processExitCode
+            : $closeExitCode;
 
         if ($exitCode !== 0) {
-            echo "<!-- zip exit code $exitCode -->\n"; flush();
-            exit;
+            $failFinalize(500, "zip failed with exit code $exitCode");
         }
 
-        echo "<!-- ZIP done: " . date('H:i:s') . " -->\n"; flush();
+        clearstatcache(true, $zipPath);
+        if (!is_file($zipPath) || !is_readable($zipPath)) {
+            $failFinalize(500, 'zip file was not created or is not readable');
+        }
+        $zipSize = filesize($zipPath);
+        if ($zipSize === false || $zipSize <= 0) {
+            $failFinalize(500, 'zip file is empty');
+        }
 
-        $fileData = file_exists($dataFile) ? json_decode(file_get_contents($dataFile), true) : [];
-        if (!is_array($fileData)) $fileData = [];
+        $fileData = read_json($dataFile, []);
         $fileDataRaw = $fileData;
 
         $upload_user = null;
@@ -410,7 +510,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         ];
 
         $baseUrl = dz_get_base_url();
-        $link    = $baseUrl . "/?lang=$lang&t=$token";
+        $link    = $baseUrl . '/?lang=' . rawurlencode($lang) . '&t=' . rawurlencode($token);
         
         $fileData[$token]['link'] = $link;
 
@@ -422,8 +522,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $fileData[$token]['verified']        = false;
         $fileData[$token]['upload_user']     = $upload_user;
 
-        unset($fileData[$uploadId]);
-        file_put_contents($dataFile, json_encode($fileData, JSON_PRETTY_PRINT));
+        $metadataSaved = update_json_file($dataFile, function (array $current) use ($uploadId, $token, $fileData): array {
+            $current[$token] = $fileData[$token];
+            unset($current[$uploadId]);
+            return $current;
+        });
+        if (!$metadataSaved) {
+            http_response_code(500);
+            exit('ERR cannot save completed upload metadata');
+        }
 
         if (Config::$default['send_email'] && $mailChoice === 'yes') {
             $encEmail  = encrypt($uploader, $secretKey);
@@ -483,6 +590,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         @rrmdir($tempDir);
         @unlink($metaPath);
         @unlink($partPath);
+        @unlink($lockPath);
+        foreach (glob(rtrim($chunksDir, '/') . '/' . $key . '-*.current') ?: [] as $currentPath) {
+            @unlink($currentPath);
+        }
 
         exit;
     }
