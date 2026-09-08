@@ -1,7 +1,7 @@
 # 📤 Dropzone File Sharing
 
 **Simple and secure file sharing via drag & drop** – with temporary links or via email, password protection, and expiration settings.  
-Version **3.3** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) – 🌐 [github.com/KeepCoolCH/DropzoneFileSharing](https://github.com/KeepCoolCH/DropzoneFileSharing) – 🌐 [hub.docker.com/r/keepcoolch/dropzonefilesharing](https://hub.docker.com/r/keepcoolch/dropzonefilesharing)
+Version **3.4** – developed by Kevin Tobler 🌐 [www.kevintobler.ch](https://www.kevintobler.ch) – 🌐 [github.com/KeepCoolCH/DropzoneFileSharing](https://github.com/KeepCoolCH/DropzoneFileSharing) – 🌐 [hub.docker.com/r/keepcoolch/dropzonefilesharing](https://hub.docker.com/r/keepcoolch/dropzonefilesharing)
 
 ---
 
@@ -15,6 +15,12 @@ Use Dropzone File Sharing:
 ## 🔄 Changelog
 
 ### 🆕 Version 3.x
+- **3.4**
+  - 🔐 **Verification link reliability**
+    - Added an automatically generated `DROPZONE_SECRET_KEY` for verification links
+    - Switched new encrypted verification parameters to authenticated AES-256-GCM
+    - Changed encrypted URL parameters to URL-safe Base64 to prevent occasional broken links caused by `+` handling in email clients or browsers
+    - Kept legacy verification link support for older encrypted links
 - **3.3**
   - 🛠️ Security fixes
 - **3.2**
@@ -142,9 +148,9 @@ Use Dropzone File Sharing:
 
 ---
 
-## 🐳 Docker Installation (Version 3.3)
+## 🐳 Docker Installation (Version 3.4)
 
-Dropzone File Sharing **V.3.3** is available as a Docker image:
+Dropzone File Sharing **V.3.4** is available as a Docker image:
 
 ```bash
 docker pull keepcoolch/dropzonefilesharing:latest

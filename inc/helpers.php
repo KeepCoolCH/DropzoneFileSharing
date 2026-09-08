@@ -381,6 +381,19 @@ function loadEnv(string $path): void {
 loadEnv($envPath);
 
 // Encryption for token links
+function dz_base64url_encode(string $data): string {
+    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+}
+
+function dz_base64url_decode(string $data): string|false {
+    $data = strtr($data, '-_', '+/');
+    $padding = strlen($data) % 4;
+    if ($padding > 0) {
+        $data .= str_repeat('=', 4 - $padding);
+    }
+    return base64_decode($data, true);
+}
+
 function encrypt(string $data, string $key): string {
     $iv = random_bytes(12);
     $tag = '';
@@ -388,10 +401,20 @@ function encrypt(string $data, string $key): string {
     if ($ciphertext === false) {
         return '';
     }
-    return urlencode('gcm:' . base64_encode($iv . $tag . $ciphertext));
+    return 'gcm.' . dz_base64url_encode($iv . $tag . $ciphertext);
 }
 function decrypt(string $data, string $key): string|false {
     $decoded = urldecode($data);
+    if (str_starts_with($decoded, 'gcm.')) {
+        $raw = dz_base64url_decode(substr($decoded, 4));
+        if ($raw === false || strlen($raw) < 29) {
+            return false;
+        }
+        $iv = substr($raw, 0, 12);
+        $tag = substr($raw, 12, 16);
+        $ciphertext = substr($raw, 28);
+        return openssl_decrypt($ciphertext, 'aes-256-gcm', hash('sha256', $key, true), OPENSSL_RAW_DATA, $iv, $tag);
+    }
     if (str_starts_with($decoded, 'gcm:')) {
         $raw = base64_decode(substr($decoded, 4), true);
         if ($raw === false || strlen($raw) < 29) {

@@ -15,8 +15,8 @@ $smtpFromAddr = getenv('SMTP_FROM_ADDRESS') ?: $smtpUser;
 $from = $smtpFromAddr;
 $secretKey = dz_secret_key();
 
-$emailEncrypted = $_GET['email'] ?? '';
-$tokenEncrypted = $_GET['token'] ?? '';
+$emailEncrypted = $_GET['email'] ?? ($_POST['email'] ?? '');
+$tokenEncrypted = $_GET['token'] ?? ($_POST['token'] ?? '');
 
 $email = decrypt($emailEncrypted, $secretKey);
 $token = decrypt($tokenEncrypted, $secretKey);
